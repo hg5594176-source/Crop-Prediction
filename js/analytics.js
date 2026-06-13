@@ -1330,9 +1330,12 @@ function showPredictionResult(result, params) {
     </div>
   `;
 
-  container.classList.add('show');
+  // Show dark wrapper so glassmorphism renders properly
+  const wrap = document.getElementById('predictionResultWrap');
+  if (wrap) wrap.style.display = 'block';
+
   setTimeout(() => {
-    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    (wrap || container).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 80);
   showToast('success', `🌾 Predicted: ${result.crop} ${result.emoji} — ${result.confidence}% confidence`);
 }

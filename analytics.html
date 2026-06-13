@@ -450,7 +450,17 @@
         </form>
 
         <!-- ===== PREDICTION RESULT ===== -->
-        <div id="predictionResult" class="prediction-result"></div>
+        <div id="predictionResultWrap" style="
+          display:none;
+          margin-top:8px;
+          background: linear-gradient(135deg, #0a0f1e 0%, #0d1520 50%, #0a1015 100%);
+          border-radius: 20px;
+          padding: 24px;
+          border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+        ">
+          <div id="predictionResult" class="prediction-result" style="display:block;margin-top:0;animation:none;"></div>
+        </div>
 
         <!-- Supported Crops Legend -->
         <div style="margin-top:28px;padding-top:20px;border-top:1.5px solid var(--card-border)">
