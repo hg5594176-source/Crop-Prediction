@@ -1720,88 +1720,141 @@ tbody td {
 }
 
 /* ── Parameter Comparison Grid ── */
+/* ── Section heading — Your Input vs Ideal ── */
 .pred-section-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text3);
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin: 24px 0 12px;
+  letter-spacing: 1px;
+  margin: 28px 0 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  text-shadow: 0 0 16px rgba(74,222,128,0.35);
+}
+
+.pred-section-label::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4ADE80, #22C55E);
+  box-shadow: 0 0 10px rgba(74,222,128,0.6);
+  flex-shrink: 0;
 }
 
 .pred-section-label::after {
   content: '';
   flex: 1;
   height: 1.5px;
-  background: linear-gradient(90deg, rgba(74,222,128,0.5), transparent);
+  background: linear-gradient(90deg, rgba(74,222,128,0.6), transparent);
   border-radius: 2px;
 }
 
+/* ── Parameter grid wrapper ── */
 .pred-param-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 12px;
 }
 
+/* ── Each parameter card ── */
 .pred-param-card {
-  background: rgba(255,255,255,0.03);
-  border: 1.5px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 14px 10px;
+  background: rgba(15, 22, 36, 0.90);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  padding: 16px 12px 14px;
   text-align: center;
   transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
+/* Top colour stripe — will be set per delta state */
 .pred-param-card::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(74,222,128,0.06), rgba(232,129,10,0.04));
-  opacity: 0;
-  transition: opacity 0.2s;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px 2px 0 0;
+  transition: background 0.2s;
 }
+
+/* Good delta — green stripe */
+.pred-param-card.card-good::before { background: linear-gradient(90deg,#4ADE80,#22C55E); box-shadow: 0 0 10px rgba(74,222,128,0.5); }
+.pred-param-card.card-good { border-color: rgba(74,222,128,0.25); }
+
+/* OK delta — yellow stripe */
+.pred-param-card.card-ok::before  { background: linear-gradient(90deg,#FCD34D,#F59E0B); box-shadow: 0 0 10px rgba(252,211,77,0.5); }
+.pred-param-card.card-ok  { border-color: rgba(252,211,77,0.25); }
+
+/* Off delta — red stripe */
+.pred-param-card.card-off::before { background: linear-gradient(90deg,#FCA5A5,#EF4444); box-shadow: 0 0 10px rgba(252,165,165,0.5); }
+.pred-param-card.card-off { border-color: rgba(252,165,165,0.25); }
 
 .pred-param-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(74,222,128,0.35);
-  box-shadow: 0 6px 24px rgba(74,222,128,0.10), 0 0 0 1px rgba(74,222,128,0.15);
+  transform: translateY(-4px);
+  border-color: rgba(74,222,128,0.40);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.50), 0 0 0 1px rgba(74,222,128,0.20);
 }
-.pred-param-card:hover::before { opacity: 1; }
 
+/* ── Label — e.g. "🌡 Temperature" ── */
 .pred-param-label {
-  font-size: 10.5px;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 6px;
-  position: relative;
-}
-
-.pred-param-value {
-  font-size: 17px;
-  font-weight: 700;
-  color: #f0f0f0;
-  position: relative;
-}
-
-/* Delta badge (vs ideal) */
-.pred-delta {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  margin-top: 5px;
-  padding: 2px 8px;
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+/* ── Your input value — BIG and BRIGHT ── */
+.pred-param-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: 8px;
+  position: relative;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* ── Delta badge (vs ideal) ── */
+.pred-delta {
+  font-size: 10.5px;
+  font-weight: 700;
+  margin-top: 4px;
+  padding: 3px 10px;
   border-radius: 999px;
   display: inline-block;
   position: relative;
+  letter-spacing: 0.2px;
 }
 
-.pred-delta.good { background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.2); }
-.pred-delta.ok   { background: rgba(252,211,77,0.12);  color: #FCD34D; border: 1px solid rgba(252,211,77,0.2); }
-.pred-delta.off  { background: rgba(252,165,165,0.12); color: #FCA5A5; border: 1px solid rgba(252,165,165,0.2); }
+.pred-delta.good {
+  background: rgba(74,222,128,0.20);
+  color: #4ADE80;
+  border: 1px solid rgba(74,222,128,0.40);
+  text-shadow: 0 0 8px rgba(74,222,128,0.4);
+}
+.pred-delta.ok {
+  background: rgba(252,211,77,0.18);
+  color: #FCD34D;
+  border: 1px solid rgba(252,211,77,0.40);
+  text-shadow: 0 0 8px rgba(252,211,77,0.3);
+}
+.pred-delta.off {
+  background: rgba(252,165,165,0.18);
+  color: #FCA5A5;
+  border: 1px solid rgba(252,165,165,0.40);
+  text-shadow: 0 0 8px rgba(252,165,165,0.3);
+}
 
 /* ── Model Info Footer ── */
 .pred-model-footer {

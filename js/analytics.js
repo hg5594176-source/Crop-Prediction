@@ -1167,7 +1167,10 @@ function showPredictionResult(result, params) {
     const sign = diff > 0 ? '+' : '';
     const cls  = Math.abs(diff) < Math.max(ideal * 0.1, 0.5) ? 'good'
                : Math.abs(diff) < Math.max(ideal * 0.25, 1)  ? 'ok' : 'off';
-    return `<span class="pred-delta ${cls}">${sign}${diff.toFixed(1)}${unit} vs ideal</span>`;
+    return {
+      badge:     `<span class="pred-delta ${cls}">${sign}${diff.toFixed(1)}${unit} vs ideal</span>`,
+      cardClass: `card-${cls}`
+    };
   };
 
   const barColor = result.suitability >= 85 ? 'linear-gradient(90deg,#22C55E,#4ADE80)'
@@ -1182,7 +1185,7 @@ function showPredictionResult(result, params) {
     { label: '🟢 Nitrogen',    val: params.nitrogen + ' kg/ha',   d: delta(params.nitrogen,    c.n,     '')   },
     { label: '🟡 Phosphorus',  val: params.phosphorus + ' kg/ha', d: delta(params.phosphorus,  c.p,     '')   },
     { label: '🟠 Potassium',   val: params.potassium + ' kg/ha',  d: delta(params.potassium,   c.k,     '')   },
-    { label: '📅 Season',      val: params.season,                d: '' },
+    { label: '📅 Season',      val: params.season,                d: null },
   ];
 
   // ── Top 4 Predictions — Rich Glassmorphism Ranking Cards ──
@@ -1304,13 +1307,16 @@ function showPredictionResult(result, params) {
     <!-- Parameter Comparison Grid -->
     <div class="pred-section-label">📊 Your Input vs Ideal for ${result.crop}</div>
     <div class="pred-param-grid">
-      ${paramRows.map(i => `
-        <div class="pred-param-card">
+      ${paramRows.map(i => {
+        const cardCls = i.d ? i.d.cardClass : '';
+        const badge   = i.d ? i.d.badge   : '';
+        return `
+        <div class="pred-param-card ${cardCls}">
           <div class="pred-param-label">${i.label}</div>
           <div class="pred-param-value">${i.val}</div>
-          ${i.d ? i.d : ''}
-        </div>
-      `).join('')}
+          ${badge}
+        </div>`;
+      }).join('')}
     </div>
 
     <!-- Model Info Footer -->
