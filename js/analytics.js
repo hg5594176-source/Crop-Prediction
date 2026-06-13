@@ -191,114 +191,246 @@ function renderWeatherAlerts() {
   `).join('');
 }
 
-/* ---- Open Weather Detail Modal ---- */
+/* ---- Open Weather Detail Modal — Glassmorphism ---- */
 function openWeatherModal(idx) {
   const a = WEATHER_ALERTS[idx];
 
-  // Remove existing modal if any
+  // Remove existing modal
   const existing = document.getElementById('weatherModalOverlay');
   if (existing) existing.remove();
 
-  const severityColors = {
-    'Extreme': 'var(--danger)',
-    'High':    'var(--warning)',
-    'Moderate':'var(--info)',
-    'None':    'var(--success)'
+  // Blob colours per alert type
+  const blobPalette = {
+    critical: 'radial-gradient(ellipse 60% 50% at 20% 20%, rgba(239,68,68,0.35) 0%,transparent 70%), radial-gradient(ellipse 50% 45% at 80% 70%, rgba(124,58,237,0.22) 0%,transparent 70%), radial-gradient(ellipse 45% 40% at 60% 30%, rgba(251,146,60,0.20) 0%,transparent 65%)',
+    warning:  'radial-gradient(ellipse 60% 50% at 15% 25%, rgba(251,146,60,0.32) 0%,transparent 70%), radial-gradient(ellipse 50% 45% at 80% 60%, rgba(252,211,77,0.22) 0%,transparent 70%), radial-gradient(ellipse 40% 40% at 55% 80%, rgba(239,68,68,0.15) 0%,transparent 65%)',
+    info:     'radial-gradient(ellipse 60% 50% at 20% 20%, rgba(59,130,246,0.30) 0%,transparent 70%), radial-gradient(ellipse 50% 45% at 80% 70%, rgba(99,102,241,0.22) 0%,transparent 70%), radial-gradient(ellipse 40% 40% at 50% 40%, rgba(167,139,250,0.18) 0%,transparent 65%)',
+    success:  'radial-gradient(ellipse 60% 50% at 15% 20%, rgba(34,197,94,0.30) 0%,transparent 70%), radial-gradient(ellipse 50% 45% at 80% 70%, rgba(74,222,128,0.22) 0%,transparent 70%), radial-gradient(ellipse 40% 40% at 55% 50%, rgba(59,130,246,0.15) 0%,transparent 65%)',
   };
-  const sevColor = severityColors[a.severity] || 'var(--muted)';
+  const blobs = blobPalette[a.type] || blobPalette['info'];
+
+  // Severity neon colour
+  const sevNeon = { Extreme: '#FCA5A5', High: '#FCD34D', Moderate: '#93C5FD', None: '#4ADE80' };
+  const sevColor = sevNeon[a.severity] || '#fff';
+
+  // Advisory icon
+  const advIcons = ['🔹','🔸','🔹','🔸','🔹'];
 
   const overlay = document.createElement('div');
   overlay.id = 'weatherModalOverlay';
-  overlay.className = 'weather-modal-overlay';
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,0.70);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    padding:20px;
+    opacity:0;transition:opacity 0.3s ease;
+  `;
+
   overlay.innerHTML = `
-    <div class="weather-modal" role="dialog" aria-modal="true">
-      <!-- Header -->
-      <div class="weather-modal-header">
-        <div class="weather-modal-icon ${a.type}">${a.icon}</div>
-        <div style="flex:1;min-width:0">
-          <div class="weather-modal-title">${a.title}</div>
-          <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
-            <span class="badge badge-${alertBadgeClass(a.type)}">${a.type.toUpperCase()}</span>
-            <span style="font-size:11px;color:var(--muted)">⏱ ${a.time}</span>
-          </div>
-        </div>
-        <button class="weather-modal-close" onclick="closeWeatherModal()" aria-label="Close">✕</button>
-      </div>
+    <div id="weatherGlassModal" style="
+      position:relative;overflow:hidden;
+      width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+      border-radius:24px;
+      background:rgba(8,12,22,0.82);
+      backdrop-filter:blur(28px) saturate(180%);
+      -webkit-backdrop-filter:blur(28px) saturate(180%);
+      border:1.5px solid rgba(255,255,255,0.10);
+      box-shadow:0 0 0 1px rgba(255,255,255,0.04),0 24px 80px rgba(0,0,0,0.70),inset 0 1px 0 rgba(255,255,255,0.08);
+      transform:scale(0.92) translateY(20px);
+      transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+      color:#fff;
+    " role="dialog" aria-modal="true">
 
-      <!-- Body -->
-      <div class="weather-modal-body">
-        <!-- Description -->
-        <p style="font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:14px">${a.desc}</p>
+      <!-- Animated blobs -->
+      <div style="
+        position:absolute;inset:0;pointer-events:none;z-index:0;
+        background:${blobs};
+        animation:wModalBlob 7s ease-in-out infinite alternate;
+      "></div>
 
-        <!-- Detail rows -->
-        <div class="weather-detail-row">
-          <span class="weather-detail-label">📍 Region</span>
-          <span class="weather-detail-val">${a.region}</span>
-        </div>
-        <div class="weather-detail-row">
-          <span class="weather-detail-label">⚠️ Severity</span>
-          <span class="weather-detail-val" style="font-weight:700;color:${sevColor}">${a.severity}</span>
-        </div>
-        <div class="weather-detail-row">
-          <span class="weather-detail-label">🌾 Crops at Risk</span>
-          <span class="weather-detail-val">${a.affectedCrops}</span>
-        </div>
-        <div class="weather-detail-row">
-          <span class="weather-detail-label">⏳ Duration</span>
-          <span class="weather-detail-val">${a.duration}</span>
+      <!-- Shimmer sweep -->
+      <div style="
+        position:absolute;top:-100%;left:-60%;width:50%;height:300%;
+        background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.05) 50%,transparent 60%);
+        animation:wModalScan 5s ease-in-out infinite;pointer-events:none;z-index:1;
+      "></div>
+
+      <!-- Content wrapper (above blobs) -->
+      <div style="position:relative;z-index:2;">
+
+        <!-- ── HEADER ── -->
+        <div style="
+          display:flex;align-items:flex-start;gap:16px;
+          padding:24px 24px 18px;
+          border-bottom:1px solid rgba(255,255,255,0.07);
+        ">
+          <!-- Icon blob -->
+          <div style="
+            width:56px;height:56px;border-radius:16px;flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;
+            font-size:28px;
+            background:rgba(255,255,255,0.08);
+            border:1.5px solid rgba(255,255,255,0.12);
+            box-shadow:0 4px 20px rgba(0,0,0,0.3);
+          ">${a.icon}</div>
+
+          <div style="flex:1;min-width:0">
+            <div style="font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:8px;line-height:1.2">${a.title}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <!-- Severity neon pill -->
+              <span style="
+                display:inline-flex;align-items:center;gap:5px;
+                background:rgba(255,255,255,0.06);
+                border:1px solid ${sevColor}55;
+                color:${sevColor};
+                font-size:11px;font-weight:700;letter-spacing:0.5px;
+                padding:4px 12px;border-radius:999px;
+                box-shadow:0 0 12px ${sevColor}33;
+              ">⚠️ ${a.severity}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.40)">⏱ ${a.time}</span>
+            </div>
+          </div>
+
+          <!-- Close button -->
+          <button onclick="closeWeatherModal()" style="
+            width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);
+            background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.70);
+            font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+            flex-shrink:0;transition:all 0.2s;
+          " onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.borderColor='rgba(239,68,68,0.4)';this.style.color='#FCA5A5'"
+             onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.70)'">✕</button>
         </div>
 
-        <!-- Weather stats -->
-        <div class="weather-modal-stats">
-          <div class="weather-stat-box">
-            <div class="weather-stat-val">🌡</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px">${a.tempRange}</div>
-            <div class="weather-stat-label">Temperature</div>
-          </div>
-          <div class="weather-stat-box">
-            <div class="weather-stat-val">💧</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px">${a.humidity}</div>
-            <div class="weather-stat-label">Humidity</div>
-          </div>
-          <div class="weather-stat-box">
-            <div class="weather-stat-val">🌧</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px">${a.rainfall}</div>
-            <div class="weather-stat-label">Expected Rainfall</div>
-          </div>
-          <div class="weather-stat-box">
-            <div class="weather-stat-val">💨</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px">${a.windSpeed}</div>
-            <div class="weather-stat-label">Wind Speed</div>
-          </div>
-        </div>
+        <!-- ── BODY ── -->
+        <div style="padding:20px 24px">
 
-        <!-- Advisory -->
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--card-border)">
-          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">
-            📋 Farmer Advisory
-          </div>
-          <ul style="padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px">
-            ${a.advisory.map(tip => `
-              <li style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)">
-                <span style="color:var(--primary);font-weight:700;flex-shrink:0;margin-top:1px">•</span>
-                ${tip}
-              </li>
+          <!-- Description -->
+          <p style="
+            font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.75;margin-bottom:18px;
+            background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+            border-radius:12px;padding:14px 16px;
+          ">${a.desc}</p>
+
+          <!-- Detail rows -->
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+            ${[
+              ['📍','Region', a.region],
+              ['🌾','Crops at Risk', a.affectedCrops],
+              ['⏳','Duration', a.duration],
+            ].map(([ic, lbl, val]) => `
+              <div style="
+                display:flex;justify-content:space-between;align-items:center;
+                padding:10px 14px;border-radius:10px;
+                background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+              ">
+                <span style="font-size:12px;color:rgba(255,255,255,0.45)">${ic} ${lbl}</span>
+                <span style="font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.85);text-align:right;max-width:60%">${val}</span>
+              </div>
             `).join('')}
-          </ul>
-        </div>
-      </div>
+          </div>
 
-      <!-- Footer -->
-      <div class="weather-modal-footer">
-        <span style="font-size:11px;color:var(--muted);margin-right:auto">Source: IMD India • AI Crop Dashboard</span>
-        <button class="btn btn-outline btn-sm" onclick="closeWeatherModal()">Close</button>
-      </div>
-    </div>
+          <!-- Weather stat boxes -->
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px">
+            ${[
+              ['🌡','Temperature', a.tempRange],
+              ['💧','Humidity', a.humidity],
+              ['🌧','Rainfall', a.rainfall],
+              ['💨','Wind Speed', a.windSpeed],
+            ].map(([ic, lbl, val]) => `
+              <div style="
+                background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);
+                border-radius:14px;padding:14px;text-align:center;
+                transition:all 0.2s;cursor:default;
+              " onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.16)'"
+                 onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.08)'">
+                <div style="font-size:24px;margin-bottom:6px">${ic}</div>
+                <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.88);margin-bottom:3px">${val}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.6px">${lbl}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Farmer Advisory -->
+          <div style="
+            background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.07);
+            border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;
+          ">
+            <!-- Rainbow top bar -->
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${sevColor},#60A5FA,#4ADE80);border-radius:2px 2px 0 0"></div>
+            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.60);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">
+              📋 Farmer Advisory
+            </div>
+            <ul style="padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+              ${a.advisory.map((tip, i) => `
+                <li style="
+                  display:flex;align-items:flex-start;gap:10px;
+                  font-size:13px;color:rgba(255,255,255,0.78);
+                  padding:10px 12px;border-radius:10px;
+                  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);
+                  line-height:1.55;
+                ">
+                  <span style="font-size:14px;flex-shrink:0;margin-top:1px">${advIcons[i % advIcons.length]}</span>
+                  ${tip}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- ── FOOTER ── -->
+        <div style="
+          display:flex;align-items:center;justify-content:space-between;
+          padding:14px 24px;
+          border-top:1px solid rgba(255,255,255,0.07);
+          background:rgba(255,255,255,0.02);
+        ">
+          <span style="font-size:11px;color:rgba(255,255,255,0.30)">📡 Source: IMD India • AI Crop Dashboard</span>
+          <button onclick="closeWeatherModal()" style="
+            background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.14);
+            color:rgba(255,255,255,0.80);font-size:12px;font-weight:600;
+            padding:8px 20px;border-radius:999px;cursor:pointer;
+            transition:all 0.2s;
+          " onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='rgba(239,68,68,0.35)';this.style.color='#FCA5A5'"
+             onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.14)';this.style.color='rgba(255,255,255,0.80)'">
+            Close ✕
+          </button>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /glass modal -->
+
+    <style>
+      @keyframes wModalBlob {
+        0%   { opacity:0.8; transform:scale(1) rotate(0deg); }
+        50%  { opacity:1;   transform:scale(1.05) rotate(2deg); }
+        100% { opacity:0.85;transform:scale(0.97) rotate(-1deg); }
+      }
+      @keyframes wModalScan {
+        0%   { transform:translateX(-100%) skewX(-10deg); }
+        60%  { transform:translateX(400%) skewX(-10deg); }
+        100% { transform:translateX(400%) skewX(-10deg); }
+      }
+      /* Scrollbar styling inside modal */
+      #weatherGlassModal::-webkit-scrollbar { width:5px; }
+      #weatherGlassModal::-webkit-scrollbar-track { background:transparent; }
+      #weatherGlassModal::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15);border-radius:999px; }
+    </style>
   `;
 
   document.body.appendChild(overlay);
 
-  // Close on overlay click outside modal
+  // Animate in
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+    const modal = document.getElementById('weatherGlassModal');
+    if (modal) {
+      requestAnimationFrame(() => {
+        modal.style.transform = 'scale(1) translateY(0)';
+      });
+    }
+  });
+
+  // Close on backdrop click
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) closeWeatherModal();
   });
@@ -309,10 +441,15 @@ function openWeatherModal(idx) {
 
 function closeWeatherModal() {
   const overlay = document.getElementById('weatherModalOverlay');
+  const modal   = document.getElementById('weatherGlassModal');
   if (overlay) {
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity 0.2s';
-    setTimeout(() => overlay.remove(), 200);
+    if (modal) {
+      modal.style.transform  = 'scale(0.92) translateY(20px)';
+      modal.style.transition = 'transform 0.25s cubic-bezier(0.4,0,1,1)';
+    }
+    overlay.style.opacity    = '0';
+    overlay.style.transition = 'opacity 0.25s ease';
+    setTimeout(() => overlay.remove(), 260);
   }
   document.removeEventListener('keydown', handleEscKey);
 }
@@ -320,6 +457,7 @@ function closeWeatherModal() {
 function handleEscKey(e) {
   if (e.key === 'Escape') closeWeatherModal();
 }
+
 
 /* ============================================
    CHARTS
