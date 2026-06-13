@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI Crop Dashboard — Full Project Documentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
+
+  :root {
+    --primary: #E8810A;
+    --green:   #22C55E;
+    --blue:    #3B82F6;
+    --purple:  #7C3AED;
+    --dark:    #1A0F00;
+    --text:    #1e1e1e;
+    --muted:   #6b7280;
+    --border:  #e5e7eb;
+    --bg-soft: #f9fafb;
+    --bg-code: #1e1e2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: #fff;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f0a00 0%, #1a0f00 40%, #2d1a00 100%);
+    color: #fff;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(232,129,10,0.15);
+    border: 1.5px solid rgba(232,129,10,0.4);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 12px; font-weight: 600; color: #F59E0B;
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .cover h1 {
+    font-size: 52px; font-weight: 900;
+    background: linear-gradient(135deg, #E8810A, #F59E0B, #22C55E);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1; margin-bottom: 16px;
+  }
+  .cover .subtitle {
+    font-size: 18px; color: rgba(255,255,255,0.65); max-width: 600px;
+    margin: 0 auto 40px;
+  }
+  .cover-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; max-width: 700px; width: 100%; margin-bottom: 50px;
+  }
+  .cover-stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 20px 12px;
+  }
+  .cover-stat .num { font-size: 28px; font-weight: 800; color: #F59E0B; }
+  .cover-stat .lbl { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+  .cover-meta { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .cover-meta span { color: rgba(255,255,255,0.7); font-weight: 600; }
+
+  /* ── CONTENT LAYOUT ── */
+  .page { max-width: 820px; margin: 0 auto; padding: 48px 48px; }
+
+  /* ── TOC ── */
+  .toc-page { page-break-after: always; }
+  .toc-title { font-size: 28px; font-weight: 800; color: var(--dark); margin-bottom: 28px; }
+  .toc-section { margin-bottom: 8px; }
+  .toc-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .toc-item:nth-child(odd) { background: var(--bg-soft); }
+  .toc-item.h1 { border-left-color: var(--primary); font-weight: 700; font-size: 14px; }
+  .toc-item.h2 { border-left-color: var(--green); padding-left: 28px; color: #374151; }
+  .toc-page-num { font-weight: 600; color: var(--primary); font-size: 12px; }
+
+  /* ── SECTION HEADERS ── */
+  .chapter {
+    page-break-before: always;
+    padding-top: 8px;
+  }
+  .chapter-header {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg, var(--dark), #2d1a00);
+    color: #fff; border-radius: 14px;
+    padding: 22px 28px; margin-bottom: 32px;
+  }
+  .chapter-icon { font-size: 36px; }
+  .chapter-num { font-size: 11px; font-weight: 700; color: #F59E0B; letter-spacing: 2px; text-transform: uppercase; }
+  .chapter-title { font-size: 26px; font-weight: 800; margin-top: 2px; }
+
+  h2 {
+    font-size: 18px; font-weight: 700; color: var(--dark);
+    margin: 28px 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid var(--primary);
+  }
+  h3 {
+    font-size: 14px; font-weight: 700; color: #374151;
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 12px; color: #374151; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12.5px; }
+  thead tr { background: var(--dark); color: #fff; }
+  thead th { padding: 10px 14px; text-align: left; font-weight: 600; }
+  tbody tr:nth-child(even) { background: var(--bg-soft); }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    border-radius: 999px; padding: 3px 10px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-green { background: rgba(34,197,94,0.12); color: #15803D; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-orange { background: rgba(232,129,10,0.12); color: #C2410C; border: 1px solid rgba(232,129,10,0.3); }
+  .badge-blue { background: rgba(59,130,246,0.12); color: #1D4ED8; border: 1px solid rgba(59,130,246,0.3); }
+  .badge-red { background: rgba(239,68,68,0.12); color: #B91C1C; border: 1px solid rgba(239,68,68,0.3); }
+  .badge-purple { background: rgba(124,58,237,0.12); color: #6D28D9; border: 1px solid rgba(124,58,237,0.3); }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--bg-code); color: #cdd6f4;
+    border-radius: 10px; padding: 18px 20px;
+    font-family: 'Fira Code', monospace; font-size: 12px;
+    overflow-x: auto; margin-bottom: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    white-space: pre-wrap; word-break: break-word;
+  }
+  code {
+    font-family: 'Fira Code', monospace; font-size: 11.5px;
+    background: rgba(232,129,10,0.1); color: #C2410C;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .kw  { color: #cba6f7; }  /* keyword */
+  .fn  { color: #89b4fa; }  /* function */
+  .str { color: #a6e3a1; }  /* string */
+  .num { color: #fab387; }  /* number */
+  .cm  { color: #585b70; }  /* comment */
+
+  /* ── FLOW / ARCH DIAGRAMS ── */
+  .flow {
+    display: flex; align-items: center; gap: 0;
+    flex-wrap: wrap; margin: 16px 0 24px;
+  }
+  .flow-box {
+    background: var(--dark); color: #fff;
+    border-radius: 10px; padding: 10px 16px;
+    font-size: 12px; font-weight: 600;
+    text-align: center; min-width: 90px;
+  }
+  .flow-box.green { background: linear-gradient(135deg,#15803D,#22C55E); }
+  .flow-box.blue  { background: linear-gradient(135deg,#1D4ED8,#3B82F6); }
+  .flow-box.orange{ background: linear-gradient(135deg,#C2410C,#E8810A); }
+  .flow-box.purple{ background: linear-gradient(135deg,#6D28D9,#7C3AED); }
+  .flow-box.red   { background: linear-gradient(135deg,#B91C1C,#EF4444); }
+  .flow-arrow { font-size: 18px; color: var(--primary); margin: 0 4px; font-weight: 700; }
+
+  /* ── NN ARCH VISUAL ── */
+  .nn-arch {
+    display: flex; justify-content: space-around; align-items: center;
+    background: linear-gradient(135deg,#0f0a00,#1a0f00);
+    border-radius: 14px; padding: 28px 20px; margin: 16px 0 24px;
+    gap: 4px; flex-wrap: wrap;
+  }
+  .nn-layer { text-align: center; }
+  .nn-nodes { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .nn-node {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(232,129,10,0.3);
+    border: 2px solid rgba(232,129,10,0.6);
+  }
+  .nn-node.big { background: rgba(59,130,246,0.3); border-color: rgba(59,130,246,0.6); }
+  .nn-node.mid { background: rgba(34,197,94,0.3); border-color: rgba(34,197,94,0.6); }
+  .nn-node.small { background: rgba(124,58,237,0.3); border-color: rgba(124,58,237,0.6); }
+  .nn-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 8px; }
+  .nn-count { font-size: 14px; font-weight: 800; color: #F59E0B; }
+  .nn-arrow { font-size: 20px; color: rgba(255,255,255,0.2); }
+
+  /* ── STEP LIST ── */
+  .steps { list-style: none; margin-bottom: 20px; }
+  .steps li {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 12px; padding: 12px 16px;
+    background: var(--bg-soft); border-radius: 10px;
+    border-left: 3px solid var(--primary);
+  }
+  .step-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body strong { display: block; font-size: 13px; color: var(--dark); margin-bottom: 2px; }
+  .step-body span { font-size: 12px; color: #6b7280; }
+
+  /* ── FEATURE GRID ── */
+  .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .feat-card {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .feat-card .feat-icon { font-size: 22px; margin-bottom: 6px; }
+  .feat-card .feat-title { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+  .feat-card .feat-desc { font-size: 11.5px; color: #6b7280; line-height: 1.5; }
+
+  /* ── ALERT BOX ── */
+  .alert {
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 16px;
+    border-left: 4px solid;
+    font-size: 12.5px;
+  }
+  .alert-warning { background: rgba(251,191,36,0.08); border-color: #F59E0B; color: #92400E; }
+  .alert-info    { background: rgba(59,130,246,0.08); border-color: #3B82F6; color: #1D4ED8; }
+  .alert-success { background: rgba(34,197,94,0.08); border-color: #22C55E; color: #15803D; }
+  .alert strong { font-weight: 700; }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { min-height: 100vh; }
+    .chapter { page-break-before: always; }
+    pre { font-size: 11px; }
+    body { font-size: 12px; }
+    .page { padding: 32px 40px; }
+  }
+
+  hr { border: none; border-top: 1.5px solid var(--border); margin: 24px 0; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+  .file-tree { font-family: 'Fira Code', monospace; font-size: 12px; line-height: 2; }
+  .file-tree .dir { color: #89b4fa; font-weight: 600; }
+  .file-tree .file { color: #a6e3a1; }
+  .file-tree .note { color: #585b70; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     COVER PAGE
+════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">🌾 Full Technical Documentation</div>
+  <h1>AI Crop Dashboard</h1>
+  <p class="subtitle">
+    A complete technical reference covering every button, feature, ML model, backend architecture, and workflow of the AI-powered agricultural decision support system.
+  </p>
+  <div class="cover-grid">
+    <div class="cover-stat"><div class="num">2,200</div><div class="lbl">Training Samples</div></div>
+    <div class="cover-stat"><div class="num">22</div><div class="lbl">Crop Classes</div></div>
+    <div class="cover-stat"><div class="num">~97%</div><div class="lbl">Model Accuracy</div></div>
+    <div class="cover-stat"><div class="num">60</div><div class="lbl">Training Epochs</div></div>
+  </div>
+  <div class="cover-meta">
+    Technology Stack: <span>TensorFlow.js 4.20</span> &nbsp;•&nbsp; <span>Supabase</span> &nbsp;•&nbsp; <span>Chart.js</span> &nbsp;•&nbsp; <span>Vanilla JS</span><br><br>
+    Dataset: <span>Kaggle Crop Recommendation Dataset</span> &nbsp;•&nbsp; Version: <span>2.0</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TABLE OF CONTENTS
+════════════════════════════════════════════════ -->
+<div class="page toc-page">
+  <div class="toc-title">📑 Table of Contents</div>
+
+  <div class="toc-item h1"><span>1. Project Overview</span><span class="toc-page-num">pg 3</span></div>
+  <div class="toc-item h2"><span>1.1 What is AI Crop Dashboard?</span></div>
+  <div class="toc-item h2"><span>1.2 Technology Stack</span></div>
+  <div class="toc-item h2"><span>1.3 Project File Structure</span></div>
+
+  <div class="toc-item h1"><span>2. Pages &amp; User Interface</span><span class="toc-page-num">pg 5</span></div>
+  <div class="toc-item h2"><span>2.1 Dashboard (index.html)</span></div>
+  <div class="toc-item h2"><span>2.2 Analytics (analytics.html)</span></div>
+  <div class="toc-item h2"><span>2.3 All Data (alldata.html)</span></div>
+
+  <div class="toc-item h1"><span>3. All Buttons &amp; Controls Explained</span><span class="toc-page-num">pg 7</span></div>
+  <div class="toc-item h2"><span>3.1 Navigation Buttons</span></div>
+  <div class="toc-item h2"><span>3.2 Auth Buttons (Login / Signup)</span></div>
+  <div class="toc-item h2"><span>3.3 Sliders &amp; Form Controls</span></div>
+  <div class="toc-item h2"><span>3.4 Predict Crop Button</span></div>
+  <div class="toc-item h2"><span>3.5 Weather Alert Buttons</span></div>
+
+  <div class="toc-item h1"><span>4. Machine Learning Model</span><span class="toc-page-num">pg 9</span></div>
+  <div class="toc-item h2"><span>4.1 Dataset — Kaggle Crop Recommendation</span></div>
+  <div class="toc-item h2"><span>4.2 Neural Network Architecture</span></div>
+  <div class="toc-item h2"><span>4.3 Training Process (Step by Step)</span></div>
+  <div class="toc-item h2"><span>4.4 Prediction / Inference</span></div>
+  <div class="toc-item h2"><span>4.5 Model Accuracy &amp; Evaluation</span></div>
+
+  <div class="toc-item h1"><span>5. Backend — How Supabase Works</span><span class="toc-page-num">pg 12</span></div>
+  <div class="toc-item h2"><span>5.1 Supabase Overview</span></div>
+  <div class="toc-item h2"><span>5.2 Authentication Flow</span></div>
+  <div class="toc-item h2"><span>5.3 Database Schema</span></div>
+  <div class="toc-item h2"><span>5.4 Data Read / Write Operations</span></div>
+  <div class="toc-item h2"><span>5.5 Row Level Security (RLS)</span></div>
+
+  <div class="toc-item h1"><span>6. Analytics &amp; Charts</span><span class="toc-page-num">pg 15</span></div>
+  <div class="toc-item h2"><span>6.1 Chart 1 — Submissions Over Time</span></div>
+  <div class="toc-item h2"><span>6.2 Chart 2 — Crop Distribution</span></div>
+  <div class="toc-item h2"><span>6.3 Chart 3 — Weather Variation</span></div>
+  <div class="toc-item h2"><span>6.4 Chart 4 — State-wise Submissions</span></div>
+
+  <div class="toc-item h1"><span>7. Weather Alert System</span><span class="toc-page-num">pg 17</span></div>
+
+  <div class="toc-item h1"><span>8. Local Server Setup</span><span class="toc-page-num">pg 18</span></div>
+
+  <div class="toc-item h1"><span>9. Data Flow — End to End</span><span class="toc-page-num">pg 19</span></div>
+
+  <div class="toc-item h1"><span>10. Troubleshooting Guide</span><span class="toc-page-num">pg 20</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 1 — PROJECT OVERVIEW
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🌾</div>
+    <div>
+      <div class="chapter-num">Chapter 01</div>
+      <div class="chapter-title">Project Overview</div>
+    </div>
+  </div>
+
+  <h2>1.1 What is AI Crop Dashboard?</h2>
+  <p>AI Crop Dashboard is a browser-based agricultural intelligence platform that helps farmers make data-driven decisions about which crop to grow. It combines a <strong>real neural network trained on Kaggle data</strong>, live charts from a PostgreSQL database, and a modern premium UI — all running in a single web browser with no separate backend server needed.</p>
+
+  <div class="feat-grid">
+    <div class="feat-card"><div class="feat-icon">🧠</div><div class="feat-title">AI Prediction</div><div class="feat-desc">TensorFlow.js neural network predicts the best crop based on 7 field parameters with ~97% accuracy.</div></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Live Analytics</div><div class="feat-desc">4 interactive Chart.js charts built from real Supabase database records.</div></div>
+    <div class="feat-card"><div class="feat-icon">🌦</div><div class="feat-title">Weather Alerts</div><div class="feat-desc">6 regional weather alerts with detailed modal popups and farmer advisories.</div></div>
+    <div class="feat-card"><div class="feat-icon">🔐</div><div class="feat-title">Secure Auth</div><div class="feat-desc">Supabase email + password authentication with protected routes.</div></div>
+    <div class="feat-card"><div class="feat-icon">📋</div><div class="feat-title">Data Management</div><div class="feat-desc">Farmers can submit and view field data records stored in Supabase PostgreSQL.</div></div>
+    <div class="feat-card"><div class="feat-icon">🎨</div><div class="feat-title">Premium UI</div><div class="feat-desc">Dark mode, glassmorphism, micro-animations, gradient themes — zero frameworks.</div></div>
+  </div>
+
+  <h2>1.2 Technology Stack</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th><th>Version</th></tr></thead>
+    <tbody>
+      <tr><td>🧠 ML Engine</td><td>TensorFlow.js</td><td>Neural network training &amp; inference in browser</td><td>4.20.0</td></tr>
+      <tr><td>🗄️ Database</td><td>Supabase (PostgreSQL)</td><td>Farmer data storage + real-time queries</td><td>v2</td></tr>
+      <tr><td>🔐 Auth</td><td>Supabase Auth</td><td>Email + password login &amp; session management</td><td>v2</td></tr>
+      <tr><td>📊 Charts</td><td>Chart.js</td><td>Interactive data visualizations</td><td>4.x</td></tr>
+      <tr><td>🖥 Frontend</td><td>Vanilla HTML/CSS/JS</td><td>UI, pages, interactions — no frameworks</td><td>ES2022</td></tr>
+      <tr><td>📂 Dataset</td><td>Kaggle CSV</td><td>2200 real agronomic samples for ML training</td><td>—</td></tr>
+      <tr><td>🔤 Fonts</td><td>Google Fonts — Inter</td><td>Typography</td><td>—</td></tr>
+      <tr><td>🌐 Server</td><td>Python http.server / Node</td><td>Local HTTP server for development</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h2>1.3 Project File Structure</h2>
+  <pre><code class="file-tree"><span class="dir">ai-crop-dashboard/</span>
+│
+├── <span class="file">index.html</span>             <span class="note">← Dashboard home page (form + stats)</span>
+├── <span class="file">analytics.html</span>         <span class="note">← AI prediction + charts + weather alerts</span>
+├── <span class="file">alldata.html</span>           <span class="note">← Table of all farmer records</span>
+│
+├── <span class="file">Crop_recommendation.csv</span> <span class="note">← Kaggle dataset (2200 rows)</span>
+├── <span class="file">schema.sql</span>             <span class="note">← Supabase database schema</span>
+├── <span class="file">README.md</span>              <span class="note">← GitHub readme</span>
+│
+├── <span class="dir">css/</span>
+│   └── <span class="file">style.css</span>          <span class="note">← All styles (39KB, 1000+ lines)</span>
+│
+├── <span class="dir">js/</span>
+│   ├── <span class="file">supabase-config.js</span>  <span class="note">← Supabase URL + anon key</span>
+│   ├── <span class="file">auth.js</span>             <span class="note">← Login, signup, session logic</span>
+│   ├── <span class="file">data.js</span>             <span class="note">← Database read/write helpers</span>
+│   ├── <span class="file">dashboard.js</span>        <span class="note">← Home page stats + form submit</span>
+│   ├── <span class="file">analytics.js</span>        <span class="note">← TF.js ML + charts + alerts (43KB)</span>
+│   └── <span class="file">alldata.js</span>          <span class="note">← Data table rendering + search</span>
+│
+├── <span class="file">start-server.ps1</span>       <span class="note">← PowerShell local server script</span>
+└── <span class="file">run.bat</span>                <span class="note">← Windows batch server launcher</span></code></pre>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 2 — PAGES & UI
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🖥️</div>
+    <div>
+      <div class="chapter-num">Chapter 02</div>
+      <div class="chapter-title">Pages &amp; User Interface</div>
+    </div>
+  </div>
+
+  <h2>2.1 Dashboard — <code>index.html</code></h2>
+  <p>The main landing page. Users log in here and see their farm overview.</p>
+  <table>
+    <thead><tr><th>Section</th><th>What It Shows</th><th>Data Source</th></tr></thead>
+    <tbody>
+      <tr><td>Top Navigation Bar</td><td>Logo, page links, dark mode toggle, logout button</td><td>Static HTML</td></tr>
+      <tr><td>Stats Cards (4 cards)</td><td>Total Submissions, Active Farmers, Avg Temperature, Top Crop</td><td>Supabase DB</td></tr>
+      <tr><td>Farmer Data Form</td><td>14 input fields — name, state, crop, soil, weather, nutrients, pH, irrigation, season</td><td>User Input → Supabase</td></tr>
+      <tr><td>Recent Activity</td><td>Last 5 farmer submissions in a list</td><td>Supabase DB</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.2 Analytics — <code>analytics.html</code></h2>
+  <p>The most complex page. Contains the ML prediction engine, 4 charts, and 6 weather alerts.</p>
+  <table>
+    <thead><tr><th>Section</th><th>What It Shows</th></tr></thead>
+    <tbody>
+      <tr><td>ML Training Progress Panel</td><td>Blue progress bar, epoch counter, loss &amp; accuracy live updates</td></tr>
+      <tr><td>Weather Alert Grid</td><td>6 clickable alert chips (Cyclone, Rainfall, Heat Wave, Frost, Good Weather, Locust)</td></tr>
+      <tr><td>Chart 1 — Submissions Over Time</td><td>Line chart: last 14 days of data submissions</td></tr>
+      <tr><td>Chart 2 — Crop Distribution</td><td>Doughnut chart: which crops farmers grow most</td></tr>
+      <tr><td>Chart 3 — Weather Variation</td><td>Bar + line chart: 12-month temp, humidity, rainfall</td></tr>
+      <tr><td>Chart 4 — State-wise Data</td><td>Horizontal bar chart: top 10 states by submissions</td></tr>
+      <tr><td>AI Prediction Form</td><td>7 sliders + 3 dropdowns for field conditions</td></tr>
+      <tr><td>Prediction Result</td><td>Crop emoji, confidence %, top-4 rankings, parameter comparison table</td></tr>
+      <tr><td>Supported Crops Legend</td><td>22 crop badges at the bottom</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.3 All Data — <code>alldata.html</code></h2>
+  <p>A full-page table showing every farmer record stored in Supabase.</p>
+  <table>
+    <thead><tr><th>Section</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Search Bar</td><td>Filter records by farmer name, state, or crop type</td></tr>
+      <tr><td>Data Table</td><td>All columns: ID, Farmer, State, Crop, Soil, Temperature, Humidity, Rainfall, N/P/K, pH, Season, Timestamp</td></tr>
+      <tr><td>Pagination</td><td>Navigate pages for large datasets</td></tr>
+      <tr><td>Export Row</td><td>Total count display</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 3 — BUTTONS & CONTROLS
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🎮</div>
+    <div>
+      <div class="chapter-num">Chapter 03</div>
+      <div class="chapter-title">All Buttons &amp; Controls Explained</div>
+    </div>
+  </div>
+
+  <h2>3.1 Navigation Buttons</h2>
+  <table>
+    <thead><tr><th>Button / Link</th><th>Location</th><th>What Happens When Clicked</th></tr></thead>
+    <tbody>
+      <tr><td>🌾 AI Crop Dashboard (Logo)</td><td>Top-left, all pages</td><td>Navigates to <code>index.html</code></td></tr>
+      <tr><td>Dashboard</td><td>Nav bar</td><td>Goes to <code>index.html</code></td></tr>
+      <tr><td>Analytics</td><td>Nav bar</td><td>Goes to <code>analytics.html</code></td></tr>
+      <tr><td>All Data</td><td>Nav bar</td><td>Goes to <code>alldata.html</code></td></tr>
+      <tr><td>🌙 Dark Mode Toggle</td><td>Nav bar, top-right</td><td>Toggles dark/light class on <code>&lt;body&gt;</code>. Preference saved in <code>localStorage</code></td></tr>
+      <tr><td>Logout</td><td>Nav bar, top-right</td><td>Calls <code>supabase.auth.signOut()</code>, redirects to login page</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.2 Auth Buttons (Login / Signup)</h2>
+  <table>
+    <thead><tr><th>Button</th><th>JS Function Called</th><th>What Happens</th></tr></thead>
+    <tbody>
+      <tr><td>Login</td><td><code>handleLogin()</code> in <code>auth.js</code></td><td>Calls <code>supabase.auth.signInWithPassword({email, password})</code>. On success → redirects to dashboard. On fail → shows error toast.</td></tr>
+      <tr><td>Sign Up</td><td><code>handleSignup()</code> in <code>auth.js</code></td><td>Calls <code>supabase.auth.signUp({email, password})</code>. Creates user in Supabase Auth. Sends confirmation email if enabled.</td></tr>
+      <tr><td>Show Password 👁</td><td>Inline toggle</td><td>Toggles <code>input[type]</code> between <code>password</code> and <code>text</code></td></tr>
+      <tr><td>Switch to Sign Up / Login</td><td>Tab toggle</td><td>Shows/hides login or signup form sections without page reload</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.3 Sliders &amp; Form Controls</h2>
+  <p>The prediction form has 7 range sliders. Each slider is wired in <code>bindRangeInputs()</code> in <code>analytics.js</code>:</p>
+  <table>
+    <thead><tr><th>Slider ID</th><th>Parameter</th><th>Min</th><th>Max</th><th>Default</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td><code>pTemp</code></td><td>Temperature</td><td>5</td><td>50</td><td>28</td><td>°C</td></tr>
+      <tr><td><code>pHumidity</code></td><td>Humidity</td><td>10</td><td>100</td><td>60</td><td>%</td></tr>
+      <tr><td><code>pRainfall</code></td><td>Rainfall</td><td>0</td><td>400</td><td>100</td><td>mm</td></tr>
+      <tr><td><code>pPh</code></td><td>Soil pH</td><td>3.5</td><td>9.5</td><td>6.5</td><td>—</td></tr>
+      <tr><td><code>pNitrogen</code></td><td>Nitrogen</td><td>0</td><td>140</td><td>50</td><td>kg/ha</td></tr>
+      <tr><td><code>pPhosphorus</code></td><td>Phosphorus</td><td>0</td><td>145</td><td>40</td><td>kg/ha</td></tr>
+      <tr><td><code>pPotassium</code></td><td>Potassium</td><td>0</td><td>205</td><td>40</td><td>kg/ha</td></tr>
+    </tbody>
+  </table>
+  <p><strong>How sliders work:</strong> Each slider fires an <code>input</code> event on every movement. The event listener simultaneously updates: (1) the live value displayed next to the slider header (<code>tempVal</code>, etc.) and (2) the input summary preview below the form (<code>sum_temp</code>, etc.).</p>
+
+  <h2>3.4 Predict Crop Button</h2>
+  <table>
+    <thead><tr><th>State</th><th>Appearance</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td>Loading (model training)</td><td>Grey pulsing, text: "⏳ Training Model… Please Wait"</td><td><code>disabled=true</code>. Clicking does nothing.</td></tr>
+      <tr><td>Ready</td><td>Green-orange gradient, text: "🤖 Predict Suitable Crop"</td><td>Enabled. Triggers form submit event.</td></tr>
+      <tr><td>Running inference</td><td>Disabled, text: "🔄 Running inference…"</td><td>Temporarily disabled while TF.js computes.</td></tr>
+    </tbody>
+  </table>
+  <p>On submit: reads all 7 slider values + season/soil dropdowns → normalizes → runs neural network → calls <code>showPredictionResult()</code>.</p>
+
+  <h2>3.5 Weather Alert Buttons</h2>
+  <table>
+    <thead><tr><th>Alert Chip</th><th>Severity</th><th>On Click</th></tr></thead>
+    <tbody>
+      <tr><td>🌪️ Cyclone Warning</td><td><span class="badge badge-red">EXTREME</span></td><td>Opens modal with wind speed, rainfall, affected crops, 5 advisory tips</td></tr>
+      <tr><td>🌧️ Heavy Rainfall</td><td><span class="badge badge-orange">HIGH</span></td><td>Opens modal with drainage advisory</td></tr>
+      <tr><td>🔥 Heat Wave</td><td><span class="badge badge-orange">HIGH</span></td><td>Opens modal with irrigation timing advisory</td></tr>
+      <tr><td>🌬️ Frost Risk</td><td><span class="badge badge-blue">MODERATE</span></td><td>Opens modal with crop cover advisory</td></tr>
+      <tr><td>☀️ Good Weather</td><td><span class="badge badge-green">NONE</span></td><td>Opens modal with sowing opportunity advisory</td></tr>
+      <tr><td>🦗 Locust Alert</td><td><span class="badge badge-orange">HIGH</span></td><td>Opens modal with spray/contact department advisory</td></tr>
+    </tbody>
+  </table>
+  <p>The modal has a <strong>Close (✕)</strong> button and also closes when: clicking outside the modal overlay, or pressing the <code>Escape</code> key.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 4 — MACHINE LEARNING MODEL
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🧠</div>
+    <div>
+      <div class="chapter-num">Chapter 04</div>
+      <div class="chapter-title">Machine Learning Model</div>
+    </div>
+  </div>
+
+  <h2>4.1 Dataset — Kaggle Crop Recommendation</h2>
+  <table>
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Source</td><td>Kaggle — Atharva Ingle (<code>Crop_recommendation.csv</code>)</td></tr>
+      <tr><td>Total Rows</td><td>2,200</td></tr>
+      <tr><td>Crop Classes</td><td>22</td></tr>
+      <tr><td>Rows per Crop</td><td>100 (perfectly balanced)</td></tr>
+      <tr><td>Input Features</td><td>N (Nitrogen), P (Phosphorus), K (Potassium), Temperature (°C), Humidity (%), pH, Rainfall (mm)</td></tr>
+      <tr><td>Label Column</td><td><code>label</code> — crop name in lowercase (e.g. <code>rice</code>, <code>maize</code>)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>All 22 Crop Classes</h3>
+  <div class="tag-row">
+    <span class="badge badge-green">🌾 Rice</span><span class="badge badge-green">🌽 Maize</span><span class="badge badge-orange">🌰 Chickpea</span><span class="badge badge-orange">🫘 Kidney Beans</span><span class="badge badge-orange">🟤 Pigeon Peas</span><span class="badge badge-orange">🟡 Moth Beans</span><span class="badge badge-green">🟢 Mung Bean</span><span class="badge badge-blue">⚫ Black Gram</span><span class="badge badge-orange">🍵 Lentil</span><span class="badge badge-red">🍎 Pomegranate</span><span class="badge badge-orange">🍌 Banana</span><span class="badge badge-orange">🥭 Mango</span><span class="badge badge-purple">🍇 Grapes</span><span class="badge badge-red">🍉 Watermelon</span><span class="badge badge-orange">🍈 Muskmelon</span><span class="badge badge-green">🍏 Apple</span><span class="badge badge-orange">🍊 Orange</span><span class="badge badge-orange">🫐 Papaya</span><span class="badge badge-orange">🥥 Coconut</span><span class="badge badge-blue">☁️ Cotton</span><span class="badge badge-green">🌿 Jute</span><span class="badge badge-orange">☕ Coffee</span>
+  </div>
+
+  <h2>4.2 Neural Network Architecture</h2>
+  <div class="nn-arch">
+    <div class="nn-layer">
+      <div class="nn-nodes"><div class="nn-node"></div><div class="nn-node"></div><div class="nn-node"></div><div class="nn-node"></div><div class="nn-node"></div><div class="nn-node"></div><div class="nn-node"></div></div>
+      <div class="nn-label">Input<br><strong style="color:#F59E0B">7</strong> features</div>
+    </div>
+    <div class="nn-arrow">→</div>
+    <div class="nn-layer">
+      <div class="nn-nodes"><div class="nn-node big"></div><div class="nn-node big"></div><div class="nn-node big"></div><div class="nn-node big"></div><div class="nn-node big"></div></div>
+      <div class="nn-label">Dense<br><strong style="color:#89b4fa">128</strong> ReLU</div>
+    </div>
+    <div class="nn-arrow">→</div>
+    <div class="nn-layer">
+      <div class="nn-nodes"><div class="nn-node big"></div><div class="nn-node big"></div><div class="nn-node big"></div></div>
+      <div class="nn-label">BatchNorm<br>+ Dropout 15%</div>
+    </div>
+    <div class="nn-arrow">→</div>
+    <div class="nn-layer">
+      <div class="nn-nodes"><div class="nn-node mid"></div><div class="nn-node mid"></div><div class="nn-node mid"></div><div class="nn-node mid"></div></div>
+      <div class="nn-label">Dense<br><strong style="color:#a6e3a1">64</strong> ReLU</div>
+    </div>
+    <div class="nn-arrow">→</div>
+    <div class="nn-layer">
+      <div class="nn-nodes"><div class="nn-node small"></div><div class="nn-node small"></div><div class="nn-node small"></div></div>
+      <div class="nn-label">Dense<br><strong style="color:#cba6f7">32</strong> ReLU</div>
+    </div>
+    <div class="nn-arrow">→</div>
+    <div class="nn-layer">
+      <div class="nn-nodes"><div class="nn-node"></div><div class="nn-node"></div><div class="nn-node"></div></div>
+      <div class="nn-label">Softmax<br><strong style="color:#F59E0B">22</strong> crops</div>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Layer</th><th>Type</th><th>Units/Rate</th><th>Activation</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Input</td><td>Dense</td><td>128 units</td><td>ReLU</td><td>Extract high-level patterns from 7 features</td></tr>
+      <tr><td>Normalization</td><td>BatchNormalization</td><td>—</td><td>—</td><td>Stabilize training, faster convergence</td></tr>
+      <tr><td>Regularization</td><td>Dropout</td><td>15%</td><td>—</td><td>Prevent overfitting</td></tr>
+      <tr><td>Hidden 1</td><td>Dense</td><td>64 units</td><td>ReLU</td><td>Mid-level feature abstraction</td></tr>
+      <tr><td>Regularization</td><td>Dropout</td><td>10%</td><td>—</td><td>Additional regularization</td></tr>
+      <tr><td>Hidden 2</td><td>Dense</td><td>32 units</td><td>ReLU</td><td>Final feature compression</td></tr>
+      <tr><td>Output</td><td>Dense</td><td>22 units</td><td>Softmax</td><td>Probability for each of the 22 crops</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4.3 Training Process — Step by Step</h2>
+  <ul class="steps">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body"><strong>Page Load → TF.js CDN loaded</strong><span>TensorFlow.js 4.20 is loaded from jsDelivr CDN before analytics.js runs.</span></div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>fetch('Crop_recommendation.csv')</strong><span>The real Kaggle CSV is fetched via HTTP from the project root. All 2200 rows are parsed into feature arrays [N,P,K,Temp,Humid,pH,Rain] and one-hot label arrays.</span></div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>Min-Max Normalization</strong><span>Each of the 7 features is scaled to [0, 1] using the column-wise min/max from the training data. The scaler parameters are saved for use during prediction.</span></div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body"><strong>Model Build</strong><span><code>tf.sequential()</code> creates the 7-layer network. <code>model.compile()</code> sets Adam optimizer (lr=0.003), categorical cross-entropy loss, accuracy metric.</span></div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-body"><strong>model.fit() — 60 Epochs</strong><span>Training runs for 60 epochs with batch size 16, 10% validation split, shuffle=true. Each epoch end fires <code>onEpochEnd</code> callback which updates the progress bar and stats in the UI.</span></div>
+    </li>
+    <li>
+      <div class="step-num">6</div>
+      <div class="step-body"><strong>Tensor Disposal</strong><span>After training, input/label tensors are disposed with <code>.dispose()</code> to free GPU/CPU memory.</span></div>
+    </li>
+    <li>
+      <div class="step-num">7</div>
+      <div class="step-body"><strong>Button Enabled</strong><span>The "Predict Suitable Crop" button is re-enabled and the training panel updates to show ✅ accuracy, sample count, epoch count, and timestamp.</span></div>
+    </li>
+  </ul>
+
+  <pre><code><span class="cm">// Simplified training call (from analytics.js)</span>
+<span class="kw">await</span> mlModel.<span class="fn">fit</span>(xsTensor, ysTensor, {
+  epochs:          <span class="num">60</span>,
+  batchSize:       <span class="num">16</span>,
+  validationSplit: <span class="num">0.1</span>,
+  shuffle:         <span class="kw">true</span>,
+  callbacks: {
+    onEpochEnd: (epoch, logs) <span class="kw">=></span> {
+      <span class="fn">updateTrainingProgress</span>(epoch + <span class="num">1</span>, <span class="num">60</span>, logs.accuracy, logs.loss);
+    }
+  }
+});</code></pre>
+
+  <h2>4.4 Prediction / Inference</h2>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-body"><strong>Read slider values</strong><span>7 values are read from the HTML range inputs using <code>getElementById(id).value</code>.</span></div></li>
+    <li><div class="step-num">2</div><div class="step-body"><strong>Normalize input</strong><span>Each value is scaled using the saved scaler: <code>(value - min) / (max - min)</code>. This must match how training data was normalized.</span></div></li>
+    <li><div class="step-num">3</div><div class="step-body"><strong>Create tensor</strong><span><code>tf.tensor2d([normalizedInput])</code> creates a 1×7 tensor.</span></div></li>
+    <li><div class="step-num">4</div><div class="step-body"><strong>Forward pass</strong><span><code>model.predict(inputTensor)</code> runs through all 7 layers and returns a 1×22 softmax output.</span></div></li>
+    <li><div class="step-num">5</div><div class="step-body"><strong>Read probabilities</strong><span><code>predTensor.dataSync()</code> reads the 22 probability values. These are sorted to find the top-4 crops.</span></div></li>
+    <li><div class="step-num">6</div><div class="step-body"><strong>Calculate suitability</strong><span>The actual input is compared to the ideal center values for the winning crop. Percentage deviation is used to compute "Field Suitability %".</span></div></li>
+    <li><div class="step-num">7</div><div class="step-body"><strong>Render result</strong><span><code>showPredictionResult()</code> injects HTML into the result container with hero card, top-4 rankings, parameter comparison, and model footer.</span></div></li>
+  </ul>
+
+  <h2>4.5 Model Accuracy &amp; Evaluation</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Training Accuracy</td><td>~97–99%</td><td>After 60 epochs on 2200 samples</td></tr>
+      <tr><td>Validation Accuracy</td><td>~95–97%</td><td>10% held-out validation split</td></tr>
+      <tr><td>Loss Function</td><td>Categorical Cross-Entropy</td><td>Standard for multi-class classification</td></tr>
+      <tr><td>Optimizer</td><td>Adam (lr=0.003)</td><td>Adaptive learning rate</td></tr>
+      <tr><td>Fallback</td><td>Synthetic Data</td><td>If CSV fetch fails, 660 synthetic samples used</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 5 — BACKEND / SUPABASE
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🗄️</div>
+    <div>
+      <div class="chapter-num">Chapter 05</div>
+      <div class="chapter-title">Backend — How Supabase Works</div>
+    </div>
+  </div>
+
+  <h2>5.1 Supabase Overview</h2>
+  <p>Supabase is an open-source Firebase alternative built on PostgreSQL. It provides a <strong>REST API, Auth service, and real-time subscriptions</strong> — accessible directly from the browser using the Supabase JavaScript SDK. No traditional backend server (Node.js, Django, etc.) is needed.</p>
+
+  <div class="flow">
+    <div class="flow-box blue">Browser<br><small>analytics.js</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box orange">Supabase JS SDK<br><small>@supabase/supabase-js</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box green">Supabase API<br><small>REST / PostgREST</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box purple">PostgreSQL DB<br><small>farmer_data table</small></div>
+  </div>
+
+  <h2>5.2 Authentication Flow</h2>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-body"><strong>User enters email + password</strong><span>On login form, user fills in credentials and clicks the Login button.</span></div></li>
+    <li><div class="step-num">2</div><div class="step-body"><strong>signInWithPassword() called</strong><span><code>supabase.auth.signInWithPassword({email, password})</code> sends a POST request to the Supabase Auth endpoint.</span></div></li>
+    <li><div class="step-num">3</div><div class="step-body"><strong>Supabase returns JWT token</strong><span>On success, Supabase returns an access token (JWT) + refresh token. The SDK stores these in browser <code>localStorage</code> automatically.</span></div></li>
+    <li><div class="step-num">4</div><div class="step-body"><strong>Session persists across pages</strong><span><code>supabase.auth.getSession()</code> is called on every page load. If a valid token exists, user is considered logged in.</span></div></li>
+    <li><div class="step-num">5</div><div class="step-body"><strong>Logout</strong><span><code>supabase.auth.signOut()</code> clears the token from localStorage and redirects to login.</span></div></li>
+  </ul>
+
+  <pre><code><span class="cm">// auth.js — Login</span>
+<span class="kw">const</span> { data, error } = <span class="kw">await</span> supabase.auth.<span class="fn">signInWithPassword</span>({
+  email:    emailInput.value,
+  password: passwordInput.value
+});
+<span class="kw">if</span> (error) <span class="fn">showToast</span>(<span class="str">'error'</span>, error.message);
+<span class="kw">else</span> window.location.href = <span class="str">'index.html'</span>;</code></pre>
+
+  <h2>5.3 Database Schema</h2>
+  <pre><code><span class="cm">-- schema.sql — Run in Supabase SQL Editor</span>
+<span class="kw">CREATE TABLE</span> farmer_data (
+  id            UUID        <span class="kw">PRIMARY KEY DEFAULT</span> gen_random_uuid(),
+  timestamp     TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW(),
+  farmer_name   TEXT,
+  state         TEXT,
+  crop_type     TEXT,
+  soil_type     TEXT,
+  temperature   NUMERIC,
+  humidity      NUMERIC,
+  rainfall      NUMERIC,
+  nitrogen      NUMERIC,
+  phosphorus    NUMERIC,
+  potassium     NUMERIC,
+  ph            NUMERIC,
+  irrigation    TEXT,
+  season        TEXT
+);
+
+<span class="cm">-- Protect the table</span>
+<span class="kw">ALTER TABLE</span> farmer_data <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="cm">-- Allow authenticated users full access</span>
+<span class="kw">CREATE POLICY</span> <span class="str">"Allow authenticated"</span> <span class="kw">ON</span> farmer_data
+  <span class="kw">FOR ALL USING</span> (auth.<span class="fn">role</span>() = <span class="str">'authenticated'</span>);</code></pre>
+
+  <h2>5.4 Data Read / Write Operations</h2>
+  <table>
+    <thead><tr><th>Operation</th><th>JS Call</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td>Insert new record</td><td><code>supabase.from('farmer_data').insert({...})</code></td><td>Farmer submits the data form</td></tr>
+      <tr><td>Read all records</td><td><code>supabase.from('farmer_data').select('*')</code></td><td>All Data page loads</td></tr>
+      <tr><td>Read for charts</td><td><code>supabase.from('farmer_data').select('cropType,state,timestamp')</code></td><td>Analytics page — chart rendering</td></tr>
+      <tr><td>Read recent 5</td><td><code>.select('*').order('timestamp',{ascending:false}).limit(5)</code></td><td>Dashboard recent activity widget</td></tr>
+      <tr><td>Count records</td><td><code>.select('*',{count:'exact',head:true})</code></td><td>Stats card "Total Submissions"</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.5 Row Level Security (RLS)</h2>
+  <p>RLS ensures that only <strong>logged-in users</strong> can read or write to <code>farmer_data</code>. Every API call automatically includes the user's JWT token in the Authorization header. Supabase validates the token server-side before allowing access.</p>
+
+  <div class="alert alert-warning">
+    <strong>⚠️ Security Note:</strong> Never expose your <code>service_role</code> key in client-side code. Only use the <code>anon</code> (public) key — it is safe to expose and respects RLS policies.
+  </div>
+
+  <div class="alert alert-info">
+    <strong>ℹ️ supabase-config.js:</strong> Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> to your own project values from the Supabase dashboard under Settings → API.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 6 — ANALYTICS & CHARTS
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">📊</div>
+    <div>
+      <div class="chapter-num">Chapter 06</div>
+      <div class="chapter-title">Analytics &amp; Charts</div>
+    </div>
+  </div>
+
+  <h2>6.1 Chart 1 — Submissions Over Time (Line Chart)</h2>
+  <table>
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Chart Type</td><td>Line (area fill)</td></tr>
+      <tr><td>X-Axis</td><td>Last 14 days (today going back)</td></tr>
+      <tr><td>Y-Axis</td><td>Number of farmer submissions per day</td></tr>
+      <tr><td>Data Source</td><td>Supabase <code>farmer_data</code> → groups by <code>timestamp</code> date</td></tr>
+      <tr><td>Color</td><td>Orange (#E8810A) with 8% fill</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.2 Chart 2 — Crop Type Distribution (Doughnut)</h2>
+  <table>
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Chart Type</td><td>Doughnut (60% cutout)</td></tr>
+      <tr><td>Segments</td><td>Top 8 crop types by count</td></tr>
+      <tr><td>Data Source</td><td>Supabase → groups by <code>crop_type</code></td></tr>
+      <tr><td>Colors</td><td>8-shade amber/orange palette</td></tr>
+      <tr><td>Legend</td><td>Right-side, crop name labels</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.3 Chart 3 — Monthly Weather Variation (Bar + Line)</h2>
+  <table>
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Chart Type</td><td>Multi-dataset: Bar (Temp + Humidity) + Line (Rainfall)</td></tr>
+      <tr><td>X-Axis</td><td>12 months (Jan–Dec)</td></tr>
+      <tr><td>Left Y-Axis</td><td>Temperature (°C) and Humidity (%)</td></tr>
+      <tr><td>Right Y-Axis</td><td>Rainfall (mm)</td></tr>
+      <tr><td>Data Source</td><td>Static agronomic averages for India (hardcoded)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.4 Chart 4 — State-wise Submissions (Horizontal Bar)</h2>
+  <table>
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Chart Type</td><td>Horizontal Bar (indexAxis: 'y')</td></tr>
+      <tr><td>Data</td><td>Top 10 Indian states by submission count</td></tr>
+      <tr><td>Data Source</td><td>Supabase → groups by <code>state</code></td></tr>
+      <tr><td>Colors</td><td>10-shade amber gradient palette</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 7 — WEATHER ALERT SYSTEM
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🌦️</div>
+    <div>
+      <div class="chapter-num">Chapter 07</div>
+      <div class="chapter-title">Weather Alert System</div>
+    </div>
+  </div>
+
+  <h2>How Weather Alerts Work</h2>
+  <p>Alerts are defined as a static JavaScript array <code>WEATHER_ALERTS[]</code> in <code>analytics.js</code>. Each object has: type, icon, title, description, region, time, severity, wind speed, rainfall, duration, advisory tips array, affected crops, temperature range, humidity.</p>
+
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-body"><strong>renderWeatherAlerts()</strong><span>Iterates <code>WEATHER_ALERTS</code> array and injects alert chip HTML into <code>#alertList</code> container.</span></div></li>
+    <li><div class="step-num">2</div><div class="step-body"><strong>User clicks chip → openWeatherModal(idx)</strong><span>Creates a full modal overlay <code>&lt;div&gt;</code> dynamically and appends it to <code>document.body</code>.</span></div></li>
+    <li><div class="step-num">3</div><div class="step-body"><strong>Modal shows full detail</strong><span>Header (icon + title + badge), description, detail rows, 4 weather stat boxes, 5-point farmer advisory list.</span></div></li>
+    <li><div class="step-num">4</div><div class="step-body"><strong>closeWeatherModal()</strong><span>Fades the overlay (opacity 0 over 200ms) then removes it from DOM. Also cleans up the Escape key listener.</span></div></li>
+  </ul>
+
+  <table>
+    <thead><tr><th>Alert</th><th>Type</th><th>Severity</th><th>Region</th><th>Advisory Points</th></tr></thead>
+    <tbody>
+      <tr><td>🌪️ Cyclone Warning</td><td>critical</td><td>Extreme</td><td>Odisha, West Bengal</td><td>5 tips including harvest &amp; evacuation</td></tr>
+      <tr><td>🌧️ Heavy Rainfall</td><td>warning</td><td>High</td><td>Punjab, Haryana, UP</td><td>5 tips including drainage &amp; fertilizer delay</td></tr>
+      <tr><td>🔥 Heat Wave</td><td>warning</td><td>High</td><td>Rajasthan, Gujarat</td><td>5 tips including irrigation timing &amp; mulching</td></tr>
+      <tr><td>🌬️ Frost Risk</td><td>info</td><td>Moderate</td><td>Himachal, J&amp;K, Uttarakhand</td><td>5 tips including polythene covers &amp; irrigation</td></tr>
+      <tr><td>☀️ Good Weather</td><td>success</td><td>None</td><td>Maharashtra, MP</td><td>5 tips including sowing &amp; spraying</td></tr>
+      <tr><td>🦗 Locust Alert</td><td>warning</td><td>High</td><td>Rajasthan-Gujarat border</td><td>5 tips including spraying &amp; watch committees</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 8 — LOCAL SERVER SETUP
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🖥️</div>
+    <div>
+      <div class="chapter-num">Chapter 08</div>
+      <div class="chapter-title">Local Server Setup</div>
+    </div>
+  </div>
+
+  <h2>Why a Local Server is Required</h2>
+  <div class="alert alert-warning">
+    <strong>⚠️ Important:</strong> You CANNOT open the app by double-clicking <code>analytics.html</code> (the <code>file://</code> protocol). Two features require HTTP:
+    <ol style="margin-top:8px;padding-left:20px">
+      <li><code>fetch('Crop_recommendation.csv')</code> — browsers block <code>fetch()</code> on <code>file://</code></li>
+      <li>Supabase Auth — requires an HTTP origin for token cookies</li>
+    </ol>
+  </div>
+
+  <h2>Option A — PowerShell Script (Recommended for Windows)</h2>
+  <pre><code><span class="cm"># Open PowerShell in the project folder and run:</span>
+.\start-server.ps1
+
+<span class="cm"># Then open browser at:</span>
+http://localhost:8080</code></pre>
+
+  <h2>Option B — Batch File</h2>
+  <pre><code>run.bat
+<span class="cm"># Double-click run.bat in Windows Explorer</span></code></pre>
+
+  <h2>Option C — Python</h2>
+  <pre><code>python -m http.server 8080
+<span class="cm"># Works on any OS with Python 3 installed</span></code></pre>
+
+  <h2>Option D — Node.js</h2>
+  <pre><code>npx serve . -p 8080
+<span class="cm"># Requires Node.js installed</span></code></pre>
+
+  <h2>Supabase Configuration</h2>
+  <pre><code><span class="cm">// js/supabase-config.js — Edit these 2 values</span>
+<span class="kw">const</span> SUPABASE_URL      = <span class="str">'https://YOUR_PROJECT.supabase.co'</span>;
+<span class="kw">const</span> SUPABASE_ANON_KEY = <span class="str">'eyJ...(your anon key)...'</span>;</code></pre>
+  <p>Get these values from: <strong>Supabase Dashboard → Settings → API</strong></p>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 9 — END-TO-END DATA FLOW
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔄</div>
+    <div>
+      <div class="chapter-num">Chapter 09</div>
+      <div class="chapter-title">Data Flow — End to End</div>
+    </div>
+  </div>
+
+  <h2>Farmer Submits Data</h2>
+  <div class="flow" style="flex-direction:column;align-items:flex-start;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box orange">Farmer fills form</div><div class="flow-arrow">→</div><div class="flow-box blue">dashboard.js handleSubmit()</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box green">Supabase .insert()</div><div class="flow-arrow">→</div><div class="flow-box purple">PostgreSQL farmer_data table</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box orange">Success toast shown + form reset</div></div>
+  </div>
+
+  <h2>AI Prediction Flow</h2>
+  <div class="flow" style="flex-direction:column;align-items:flex-start;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box orange">Page loads</div><div class="flow-arrow">→</div><div class="flow-box blue">TF.js CDN loaded</div><div class="flow-arrow">→</div><div class="flow-box green">fetch CSV (2200 rows)</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box purple">Parse CSV → Normalize → Build tensors</div><div class="flow-arrow">→</div><div class="flow-box orange">model.fit() 60 epochs</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box green">User adjusts sliders</div><div class="flow-arrow">→</div><div class="flow-box blue">Normalize input</div><div class="flow-arrow">→</div><div class="flow-box purple">model.predict()</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box orange">22 softmax probabilities → Top crop → showPredictionResult()</div></div>
+  </div>
+
+  <h2>Chart Data Flow</h2>
+  <div class="flow" style="flex-direction:column;align-items:flex-start;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box blue">analytics.html loads</div><div class="flow-arrow">→</div><div class="flow-box green">getAllData() → Supabase .select('*')</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box purple">Data array returned</div><div class="flow-arrow">→</div><div class="flow-box orange">renderCharts() calls 4 chart functions</div></div>
+    <div style="display:flex;align-items:center;gap:8px;padding-left:40px"><div class="flow-arrow">↓</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="flow-box green">new Chart(ctx, config) → canvas rendered</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHAPTER 10 — TROUBLESHOOTING
+════════════════════════════════════════════════ -->
+<div class="page chapter">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔧</div>
+    <div>
+      <div class="chapter-num">Chapter 10</div>
+      <div class="chapter-title">Troubleshooting Guide</div>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Problem</th><th>Likely Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Button says "Training…" and never enables</td>
+        <td>TF.js CDN failed to load, or CSV fetch failed</td>
+        <td>Check browser console for network errors. Ensure you're on <code>http://localhost</code> not <code>file://</code></td>
+      </tr>
+      <tr>
+        <td>"CSV not found" toast appears</td>
+        <td><code>Crop_recommendation.csv</code> missing from project root</td>
+        <td>Copy the CSV file to the same folder as <code>analytics.html</code></td>
+      </tr>
+      <tr>
+        <td>Charts show no data</td>
+        <td>Supabase not configured or no records yet</td>
+        <td>Set correct URL + anon key in <code>supabase-config.js</code>. Add at least 1 record via the form.</td>
+      </tr>
+      <tr>
+        <td>"Email not confirmed" on login</td>
+        <td>Supabase email confirmation is ON</td>
+        <td>Supabase Dashboard → Auth → Settings → Disable "Enable email confirmations"</td>
+      </tr>
+      <tr>
+        <td>Sliders don't update live values</td>
+        <td>JS error crashing the script</td>
+        <td>Open browser DevTools (F12) → Console tab → fix any red errors shown</td>
+      </tr>
+      <tr>
+        <td>Prediction always shows same crop</td>
+        <td>Model not trained (mlModel is null)</td>
+        <td>Wait for training to complete. Green toast "Neural Network trained!" confirms readiness.</td>
+      </tr>
+      <tr>
+        <td>Page redirects to login immediately</td>
+        <td>No valid session / JWT expired</td>
+        <td>Log in again. Sessions expire after 1 hour by default in Supabase.</td>
+      </tr>
+      <tr>
+        <td>run.bat / start-server.ps1 doesn't work</td>
+        <td>Python or PowerShell execution policy</td>
+        <td>Run <code>python -m http.server 8080</code> manually in terminal, or use <code>npx serve . -p 8080</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Browser Console Debug Tips</h2>
+  <pre><code><span class="cm">// Check if TF.js loaded:</span>
+console.log(typeof tf);         <span class="cm">// Should print "object"</span>
+
+<span class="cm">// Check if model is trained:</span>
+console.log(mlModel);           <span class="cm">// Should not be null after ~20 seconds</span>
+
+<span class="cm">// Check Supabase session:</span>
+<span class="kw">const</span> { data } = <span class="kw">await</span> supabase.auth.<span class="fn">getSession</span>();
+console.log(data.session);      <span class="cm">// Should show user object if logged in</span>
+
+<span class="cm">// Test DB connection:</span>
+<span class="kw">const</span> { data, error } = <span class="kw">await</span> supabase.<span class="fn">from</span>(<span class="str">'farmer_data'</span>).<span class="fn">select</span>(<span class="str">'*'</span>).<span class="fn">limit</span>(<span class="num">1</span>);
+console.log(data, error);</code></pre>
+
+  <hr>
+
+  <div class="alert alert-success">
+    <strong>✅ Everything working?</strong> Open <code>http://localhost:8080/analytics.html</code> — you should see the blue training bar fill up, then a green ✅ confirmation toast, and the predict button turns orange-green. Enter your field conditions and click Predict!
+  </div>
+
+  <div style="text-align:center;margin-top:48px;padding-top:32px;border-top:1.5px solid var(--border)">
+    <div style="font-size:32px;margin-bottom:12px">🌾</div>
+    <div style="font-size:18px;font-weight:800;color:var(--dark);margin-bottom:6px">AI Crop Dashboard</div>
+    <div style="font-size:12px;color:var(--muted)">Full Project Documentation &nbsp;•&nbsp; Built with TensorFlow.js, Supabase &amp; Chart.js &nbsp;•&nbsp; Kaggle Crop Dataset</div>
+    <div style="font-size:11px;color:#d1d5db;margin-top:8px">Made with ❤️ for Indian Farmers</div>
+  </div>
+</div>
+
+<!-- ── PRINT BUTTON (not printed) ── -->
+<div style="position:fixed;bottom:24px;right:24px;z-index:999;display:flex;gap:10px" class="no-print">
+  <button onclick="window.print()" style="background:linear-gradient(135deg,#E8810A,#F59E0B);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(232,129,10,0.4);font-family:Inter,sans-serif">
+    🖨️ Save as PDF
+  </button>
+</div>
+
+<style>
+@media print {
+  .no-print { display: none !important; }
+  .cover { background: #0f0a00 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .chapter-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .nn-arch { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cover-grid, .cover-stat { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+</body>
+</html>

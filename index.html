@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Crop Dashboard — Home</title>
+  <meta name="description" content="AI-powered crop management dashboard for farmers. Track data, predict crops, and monitor weather alerts." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+</head>
+<body>
+
+<!-- ===================== AUTH OVERLAY ===================== -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-container fade-in">
+    <div class="auth-logo">
+      <div class="logo-big">🌾</div>
+      <h1>AI Crop Dashboard</h1>
+      <p>Smart farming intelligence at your fingertips</p>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="signin">Sign In</div>
+        <div class="auth-tab" data-tab="signup">Sign Up</div>
+      </div>
+
+      <!-- Sign In -->
+      <form id="signinForm" class="auth-form active">
+        <div id="signinError" class="auth-error"></div>
+        <div class="form-group">
+          <label>📧 Email Address</label>
+          <input type="email" id="signinEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Password</label>
+          <input type="password" id="signinPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In to Dashboard →</button>
+      </form>
+
+      <!-- Sign Up -->
+      <form id="signupForm" class="auth-form">
+        <div id="signupError" class="auth-error"></div>
+        <div class="form-group">
+          <label>👤 Full Name</label>
+          <input type="text" id="signupName" placeholder="Ramesh Kumar" required />
+        </div>
+        <div class="form-group">
+          <label>📧 Gmail Address</label>
+          <input type="email" id="signupEmail" placeholder="ramesh@gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Password</label>
+          <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Confirm Password</label>
+          <input type="password" id="signupConfirm" placeholder="Re-enter password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP WRAPPER ===================== -->
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🌾</div>
+      <div>
+        <h2>AI Crop</h2>
+        <span>Dashboard</span>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarUserInit">R</div>
+      <div class="sidebar-user-info">
+        <div class="greeting">Welcome back,</div>
+        <div class="user-name" id="sidebarUserName">Farmer</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main Menu</div>
+      <a href="index.html" class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="alldata.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>All Data</span>
+      </a>
+      <a href="analytics.html" class="nav-item">
+        <span class="nav-icon">🔬</span>
+        <span>Analytics & Predict</span>
+      </a>
+
+      <div class="nav-section-label" style="margin-top:12px">Quick Actions</div>
+      <a href="#farmerFormSection" class="nav-item">
+        <span class="nav-icon">➕</span>
+        <span>Add Farmer Data</span>
+      </a>
+      <a href="alldata.html" class="nav-item">
+        <span class="nav-icon">⬇</span>
+        <span>Export Data</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="dark-mode-card" style="margin-bottom: 12px;">
+        <div class="dark-mode-row">
+          <div class="dark-mode-text-group">
+            <span class="dark-mode-title">Appearance</span>
+            <span class="dark-mode-subtitle" id="themeText">Light Mode</span>
+          </div>
+          <label class="cosmic-switch">
+            <input type="checkbox" id="darkToggle" />
+            <span class="cosmic-slider">
+              <span class="cosmic-icon light">☀️</span>
+              <span class="cosmic-icon dark">🌙</span>
+            </span>
+          </label>
+        </div>
+        
+        <div class="user-badge">
+          <div class="badge-dot-container">
+            <span class="status-dot"></span>
+          </div>
+          <div class="badge-text" id="sidebarEmail">Not signed in</div>
+        </div>
+      </div>
+
+      <button class="logout-btn" id="logoutBtn">
+        🚪 Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title">🏡 Dashboard</div>
+          <div class="page-subtitle">Manage your farm data and insights</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-badge">🌾 Season: Kharif 2025</div>
+        <div class="topbar-badge" style="background:linear-gradient(135deg,var(--success),#16A34A)">
+          🟢 Live
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- ===== STATS ===== -->
+      <div class="stat-grid fade-in">
+        <div class="stat-card">
+          <div class="stat-icon orange">📋</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Total Records</div>
+            <div class="stat-change up">↑ All time</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">👨‍🌾</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statFarmers">0</div>
+            <div class="stat-label">Unique Farmers</div>
+            <div class="stat-change up">↑ Registered</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">🗺️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statStates">0</div>
+            <div class="stat-label">States Covered</div>
+            <div class="stat-change up">↑ Across India</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon wheat">📅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statToday">0</div>
+            <div class="stat-label">Today's Entries</div>
+            <div class="stat-change up">↑ This session</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FARMER DATA FORM ===== -->
+      <div id="farmerFormSection" class="card fade-in" style="margin-bottom:24px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">➕ Add Farmer Data</div>
+            <div class="card-subtitle">Fill in the details to register new crop and farmer information</div>
+          </div>
+        </div>
+        <div class="section-divider"></div>
+
+        <form id="farmerForm">
+          <div class="form-grid">
+            <!-- Row 1 -->
+            <div class="form-group">
+              <label for="ffName">Farmer Name <span class="req">*</span></label>
+              <input type="text" id="ffName" placeholder="e.g. Ramesh Kumar" />
+            </div>
+            <div class="form-group">
+              <label for="ffState">State <span class="req">*</span></label>
+              <select id="ffState">
+                <option value="">— Select State —</option>
+                <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+                <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+                <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+                <option>Himachal Pradesh</option><option>Jharkhand</option>
+                <option>Karnataka</option><option>Kerala</option>
+                <option>Madhya Pradesh</option><option>Maharashtra</option>
+                <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+                <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+                <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+                <option>Telangana</option><option>Tripura</option>
+                <option>Uttar Pradesh</option><option>Uttarakhand</option>
+                <option>West Bengal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ffDistrict">District</label>
+              <input type="text" id="ffDistrict" placeholder="e.g. Ludhiana" />
+            </div>
+            <div class="form-group">
+              <label for="ffVillage">Village / Town</label>
+              <input type="text" id="ffVillage" placeholder="e.g. Sahnewal" />
+            </div>
+
+            <!-- Row 2 -->
+            <div class="form-group">
+              <label for="ffCrop">Crop Type <span class="req">*</span></label>
+              <select id="ffCrop">
+                <option value="">— Select Crop —</option>
+                <option>Wheat</option><option>Rice</option><option>Maize</option>
+                <option>Sugarcane</option><option>Cotton</option><option>Soybean</option>
+                <option>Mustard</option><option>Barley</option><option>Jowar</option>
+                <option>Bajra</option><option>Groundnut</option><option>Chickpea</option>
+                <option>Lentil</option><option>Potato</option><option>Tomato</option>
+                <option>Onion</option><option>Banana</option><option>Mango</option>
+                <option>Turmeric</option><option>Ginger</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ffArea">Land Area (Acres)</label>
+              <input type="number" id="ffArea" placeholder="e.g. 5.5" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="ffSoil">Soil Type</label>
+              <select id="ffSoil">
+                <option value="">— Select Soil —</option>
+                <option>Alluvial</option><option>Black (Regur)</option><option>Red</option>
+                <option>Laterite</option><option>Loamy</option><option>Sandy</option>
+                <option>Clay</option><option>Sandy Loam</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ffIrrigation">Irrigation Method</label>
+              <select id="ffIrrigation">
+                <option value="">— Select —</option>
+                <option>Canal</option><option>Tube Well</option><option>Drip</option>
+                <option>Sprinkler</option><option>Rain-fed</option><option>Tank</option>
+              </select>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="form-group">
+              <label for="ffSeason">Season</label>
+              <select id="ffSeason">
+                <option value="">— Season —</option>
+                <option>Kharif</option><option>Rabi</option><option>Zaid</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ffSowing">Sowing Date</label>
+              <input type="text" id="ffSowing" placeholder="e.g. 2025-06-15" />
+            </div>
+            <div class="form-group">
+              <label for="ffHarvest">Expected Harvest</label>
+              <input type="text" id="ffHarvest" placeholder="e.g. 2025-11-20" />
+            </div>
+            <div class="form-group full">
+              <label for="ffRemarks">Remarks / Notes</label>
+              <textarea id="ffRemarks" placeholder="Any additional notes about this entry..."></textarea>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
+            <button type="submit" class="btn btn-primary">
+              💾 Save Farmer Record
+            </button>
+            <button type="reset" class="btn btn-outline">
+              ↩ Reset Form
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== RECENT SUBMISSIONS ===== -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📋 Recent Submissions</div>
+            <div class="card-subtitle">Last 10 farmer records added to the system</div>
+          </div>
+          <a href="alldata.html" class="btn btn-outline btn-sm">View All →</a>
+        </div>
+        <div class="section-divider"></div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Farmer</th>
+                <th>State</th>
+                <th>Crop</th>
+                <th>Area</th>
+                <th>Soil</th>
+                <th>Season</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recentTbody">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== QUICK INFO CARDS ===== -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:24px">
+        <div class="card" style="border-left:4px solid var(--success)">
+          <div class="card-title">🌱 Crop of the Month</div>
+          <div style="margin-top:10px;font-size:32px">🌾 Wheat</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:6px">Most registered crop this Rabi season across North India states</div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--warning)">
+          <div class="card-title">☀️ Weather Today</div>
+          <div style="margin-top:10px;font-size:13px;color:var(--text2);line-height:1.7">
+            🌡 Avg: <b>32°C</b> &nbsp;|&nbsp; 💧 Humidity: <b>58%</b><br/>
+            🌧 Light rain expected in North India<br/>
+            ⚠️ Heat wave warning in Rajasthan
+          </div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--primary)">
+          <div class="card-title">💡 Agri Tip of the Day</div>
+          <div style="margin-top:10px;font-size:13px;color:var(--text2);line-height:1.7">
+            Use <b>drip irrigation</b> to conserve water up to <b>50%</b> vs. flood irrigation. Ideal for cotton and vegetables in dry regions.
+          </div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--info)">
+          <div class="card-title">📈 System Info</div>
+          <div style="margin-top:10px;font-size:13px;color:var(--text2);line-height:1.7">
+            All data stored <b>locally & securely</b><br/>
+            Export records anytime as <b>CSV</b><br/>
+            AI Prediction: <b>15 crop types</b> supported
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+
+    // Override auth callback to initialize dashboard after form submission
+    onPageInit = () => {
+      initDashboard();
+    };
+
+    // Check for existing session
+    const user = await initAuth();
+    if (user) {
+      initDashboard();
+    }
+  });
+</script>
+</body>
+</html>

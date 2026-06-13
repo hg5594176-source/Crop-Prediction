@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics & Crop Prediction — AI Crop Dashboard</title>
+  <meta name="description" content="Weather alerts, data analytics charts, and AI-powered crop prediction based on soil and climate conditions." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-container fade-in">
+    <div class="auth-logo">
+      <div class="logo-big">🌾</div>
+      <h1>AI Crop Dashboard</h1>
+      <p>Sign in to access analytics and predictions</p>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="signin">Sign In</div>
+        <div class="auth-tab" data-tab="signup">Sign Up</div>
+      </div>
+      <form id="signinForm" class="auth-form active">
+        <div id="signinError" class="auth-error"></div>
+        <div class="form-group">
+          <label>📧 Email Address</label>
+          <input type="email" id="signinEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Password</label>
+          <input type="password" id="signinPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In →</button>
+      </form>
+      <form id="signupForm" class="auth-form">
+        <div id="signupError" class="auth-error"></div>
+        <div class="form-group">
+          <label>👤 Full Name</label>
+          <input type="text" id="signupName" placeholder="Ramesh Kumar" required />
+        </div>
+        <div class="form-group">
+          <label>📧 Gmail Address</label>
+          <input type="email" id="signupEmail" placeholder="ramesh@gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Password</label>
+          <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Confirm Password</label>
+          <input type="password" id="signupConfirm" placeholder="Re-enter password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="app-wrapper">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🌾</div>
+      <div>
+        <h2>AI Crop</h2>
+        <span>Dashboard</span>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarUserInit">R</div>
+      <div class="sidebar-user-info">
+        <div class="greeting">Welcome back,</div>
+        <div class="user-name" id="sidebarUserName">Farmer</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main Menu</div>
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="alldata.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>All Data</span>
+      </a>
+      <a href="analytics.html" class="nav-item active">
+        <span class="nav-icon">🔬</span>
+        <span>Analytics & Predict</span>
+      </a>
+      <div class="nav-section-label" style="margin-top:12px">On This Page</div>
+      <a href="#weatherSection" class="nav-item">
+        <span class="nav-icon">🌦</span>
+        <span>Weather Alerts</span>
+      </a>
+      <a href="#chartsSection" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span>Charts</span>
+      </a>
+      <a href="#predictionSection" class="nav-item">
+        <span class="nav-icon">🤖</span>
+        <span>Crop Prediction</span>
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="dark-mode-card" style="margin-bottom: 12px;">
+        <div class="dark-mode-row">
+          <div class="dark-mode-text-group">
+            <span class="dark-mode-title">Appearance</span>
+            <span class="dark-mode-subtitle" id="themeText">Light Mode</span>
+          </div>
+          <label class="cosmic-switch">
+            <input type="checkbox" id="darkToggle" />
+            <span class="cosmic-slider">
+              <span class="cosmic-icon light">☀️</span>
+              <span class="cosmic-icon dark">🌙</span>
+            </span>
+          </label>
+        </div>
+        
+        <div class="user-badge">
+          <div class="badge-dot-container">
+            <span class="status-dot"></span>
+          </div>
+          <div class="badge-text" id="sidebarEmail">Not signed in</div>
+        </div>
+      </div>
+
+      <button class="logout-btn" id="logoutBtn">
+        🚪 Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title">🔬 Analytics & Crop Prediction</div>
+          <div class="page-subtitle">Weather alerts, data charts, and AI-powered crop recommendations</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-badge">🤖 AI Powered</div>
+        <div class="topbar-badge" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8)">
+          📡 Live Weather
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- ===== WEATHER ALERTS ===== -->
+      <div id="weatherSection" class="card fade-in" style="margin-bottom:24px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🌦 Weather Warnings & Alerts</div>
+            <div class="card-subtitle">Click any alert card to view full weather details & farmer advisory</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span class="badge badge-red" style="font-size:10px">🔴 Critical</span>
+            <span class="badge badge-orange" style="font-size:10px">🟠 Warning</span>
+            <span class="badge badge-blue" style="font-size:10px">🔵 Info</span>
+            <span class="badge badge-green" style="font-size:10px">🟢 Good</span>
+          </div>
+        </div>
+        <div class="section-divider"></div>
+        <div class="alert-list" id="alertList">
+          <div style="text-align:center;padding:24px;color:var(--muted)">Loading alerts...</div>
+        </div>
+      </div>
+
+      <!-- ===== CHARTS ===== -->
+      <div id="chartsSection">
+        <div class="section-header">
+          <div class="section-title">📈 Data Analytics Charts</div>
+          <span style="font-size:13px;color:var(--muted)">Based on submitted farmer records</span>
+        </div>
+
+        <div class="chart-grid">
+          <!-- Chart 1: Submissions over time -->
+          <div class="card fade-in">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📅 Submissions Over Time</div>
+                <div class="card-subtitle">Records added per day (last 14 days)</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="submissionsChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Crop Distribution -->
+          <div class="card fade-in">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🌾 Crop Type Distribution</div>
+                <div class="card-subtitle">Share of each crop in the database</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="cropDistChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 3: Weather Variation -->
+          <div class="card fade-in">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🌡 Weather Variation (Annual)</div>
+                <div class="card-subtitle">Monthly temperature, humidity & rainfall trends</div>
+              </div>
+            </div>
+            <div class="chart-container" style="height:280px">
+              <canvas id="weatherChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 4: State-wise Submissions -->
+          <div class="card fade-in">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🗺 State-wise Submissions</div>
+                <div class="card-subtitle">Top 10 states by number of records</div>
+              </div>
+            </div>
+            <div class="chart-container" style="height:280px">
+              <canvas id="stateChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CROP PREDICTION ===== -->
+      <div id="predictionSection" class="card fade-in" style="margin-top:8px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🤖 AI Crop Prediction Engine</div>
+            <div class="card-subtitle">Enter your field conditions to get the most suitable crop recommendation</div>
+          </div>
+          <div class="topbar-badge">🧠 Neural Network ML</div>
+        </div>
+
+        <!-- ML Training Progress Panel (hidden until trainMLModel runs) -->
+        <div id="mlTrainingPanel" style="display:none;background:linear-gradient(135deg,rgba(59,130,246,0.07),rgba(34,197,94,0.05));border:1.5px solid rgba(59,130,246,0.25);border-radius:var(--radius-sm);padding:14px 16px;margin:0 0 16px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:16px">🧠</span>
+            <span style="font-weight:700;color:#3B82F6;font-size:13px">Training Neural Network (TensorFlow.js)…</span>
+            <span id="mlProgressPct" style="margin-left:auto;font-weight:700;color:#3B82F6;font-size:13px">0%</span>
+          </div>
+          <div style="background:rgba(59,130,246,0.12);border-radius:999px;height:8px;overflow:hidden;margin-bottom:8px">
+            <div id="mlProgressFill" style="height:8px;width:0%;border-radius:999px;background:linear-gradient(90deg,#3B82F6,#22C55E,#F59E0B);transition:width 0.3s ease"></div>
+          </div>
+          <div id="mlProgressStat" style="font-size:11.5px;color:var(--text2);font-family:monospace">Initializing…</div>
+        </div>
+        <div class="section-divider"></div>
+
+        <form id="predictionForm">
+
+          <!-- ---- Row 1: Temperature & Humidity ---- -->
+          <div class="form-grid" style="margin-bottom:20px">
+            <div class="form-group">
+              <div class="range-group">
+                <div class="range-header">
+                  <label>🌡 Temperature (°C)</label>
+                  <span class="range-value" id="tempVal">28</span>°C
+                </div>
+                <input type="range" id="pTemp" min="5" max="50" value="28"
+                       data-display="tempVal" step="1" />
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                  <span>5°C (Cold)</span><span>50°C (Hot)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="range-group">
+                <div class="range-header">
+                  <label>💧 Humidity (%)</label>
+                  <span class="range-value" id="humidVal">60</span>%
+                </div>
+                <input type="range" id="pHumidity" min="10" max="100" value="60"
+                       data-display="humidVal" step="1" />
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                  <span>10% (Dry)</span><span>100% (Humid)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="range-group">
+                <div class="range-header">
+                  <label>🌧 Rainfall (mm)</label>
+                  <span class="range-value" id="rainVal">100</span>mm
+                </div>
+                <input type="range" id="pRainfall" min="0" max="400" value="100"
+                       data-display="rainVal" step="5" />
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                  <span>0 (None)</span><span>400mm (Heavy)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="range-group">
+                <div class="range-header">
+                  <label>🧪 Soil pH Level</label>
+                  <span class="range-value" id="phVal">6.5</span>
+                </div>
+                <input type="range" id="pPh" min="3" max="10" value="6.5"
+                       data-display="phVal" step="0.1" />
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                  <span>3 (Acidic)</span><span>10 (Alkaline)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---- Row 2: NPK ---- -->
+          <div style="background:var(--bg2);border:1.5px solid var(--card-border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+            <div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+              🌿 Soil Nutrient Levels (kg/hectare)
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <div class="range-group">
+                  <div class="range-header">
+                    <label>🟢 Nitrogen (N)</label>
+                    <span class="range-value" id="nitroVal">50</span>
+                  </div>
+                  <input type="range" id="pNitrogen" min="0" max="140" value="50"
+                         data-display="nitroVal" step="1" />
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                    <span>0 (Deficient)</span><span>140 (High)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="range-group">
+                  <div class="range-header">
+                    <label>🟡 Phosphorus (P)</label>
+                    <span class="range-value" id="phosphoVal">40</span>
+                  </div>
+                  <input type="range" id="pPhosphorus" min="0" max="145" value="40"
+                         data-display="phosphoVal" step="1" />
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                    <span>0 (Deficient)</span><span>145 (High)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="range-group">
+                  <div class="range-header">
+                    <label>🟠 Potassium (K)</label>
+                    <span class="range-value" id="potassVal">40</span>
+                  </div>
+                  <input type="range" id="pPotassium" min="0" max="205" value="40"
+                         data-display="potassVal" step="1" />
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px">
+                    <span>0 (Deficient)</span><span>205 (High)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---- Row 3: Selects ---- -->
+          <div class="form-grid" style="margin-bottom:20px">
+            <div class="form-group">
+              <label for="pSeason">📅 Season</label>
+              <select id="pSeason">
+                <option value="Kharif">Kharif (June – October)</option>
+                <option value="Rabi">Rabi (November – April)</option>
+                <option value="Zaid">Zaid (March – June)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="pSoil">🪨 Soil Type</label>
+              <select id="pSoil">
+                <option value="Loamy">Loamy</option>
+                <option value="Alluvial">Alluvial</option>
+                <option value="Black">Black (Regur)</option>
+                <option value="Red">Red</option>
+                <option value="Sandy">Sandy</option>
+                <option value="Clay">Clay</option>
+                <option value="Sandy Loam">Sandy Loam</option>
+                <option value="Laterite">Laterite</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="pState">🗺 Your State (optional)</label>
+              <select id="pState">
+                <option value="">— Select State —</option>
+                <option>Andhra Pradesh</option><option>Bihar</option>
+                <option>Gujarat</option><option>Haryana</option>
+                <option>Karnataka</option><option>Kerala</option>
+                <option>Madhya Pradesh</option><option>Maharashtra</option>
+                <option>Odisha</option><option>Punjab</option>
+                <option>Rajasthan</option><option>Tamil Nadu</option>
+                <option>Telangana</option><option>Uttar Pradesh</option>
+                <option>West Bengal</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="pWaterSource">💦 Water Source</label>
+              <select id="pWaterSource">
+                <option value="Tube Well">Tube Well</option>
+                <option value="Canal">Canal</option>
+                <option value="Rain-fed">Rain-fed</option>
+                <option value="Drip">Drip Irrigation</option>
+                <option value="River">River / Stream</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ---- Summary Preview ---- -->
+          <div style="background:linear-gradient(135deg,rgba(232,129,10,0.08),rgba(212,168,67,0.05));border:1.5px dashed var(--primary);border-radius:var(--radius);padding:16px;margin-bottom:20px">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">
+              📋 Your Input Summary
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--text2)">
+              <span>🌡 <span id="sum_temp">28</span>°C</span>
+              <span>💧 <span id="sum_humid">60</span>%</span>
+              <span>🌧 <span id="sum_rain">100</span>mm</span>
+              <span>🧪 pH <span id="sum_ph">6.5</span></span>
+              <span>🟢 N: <span id="sum_n">50</span></span>
+              <span>🟡 P: <span id="sum_p">40</span></span>
+              <span>🟠 K: <span id="sum_k">40</span></span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:20px">
+            <button type="submit" id="predictBtn" class="btn-predict" disabled
+                    style="background:linear-gradient(135deg,#6B7280,#9CA3AF);box-shadow:none;animation:pulse 1.5s ease-in-out infinite;cursor:wait">
+              ⏳ Training Model… Please Wait
+            </button>
+            <span style="font-size:11px;color:var(--muted)">Model will be ready in ~10–20 seconds</span>
+          </div>
+        </form>
+
+        <!-- ===== PREDICTION RESULT ===== -->
+        <div id="predictionResult" class="prediction-result"></div>
+
+        <!-- Supported Crops Legend -->
+        <div style="margin-top:28px;padding-top:20px;border-top:1.5px solid var(--card-border)">
+          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px">
+            🌾 Supported Crops (22 types) &nbsp;·&nbsp; <span style="color:#22C55E;font-weight:700">660 training samples</span> &nbsp;·&nbsp; TensorFlow.js Neural Network:
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="badge badge-wheat">🌾 Rice</span>
+            <span class="badge badge-wheat">🌽 Maize</span>
+            <span class="badge badge-wheat">🌰 Chickpea</span>
+            <span class="badge badge-wheat">🫘 Kidney Beans</span>
+            <span class="badge badge-wheat">🟤 Pigeon Peas</span>
+            <span class="badge badge-wheat">🟡 Moth Beans</span>
+            <span class="badge badge-wheat">🟢 Mung Bean</span>
+            <span class="badge badge-wheat">⚫ Black Gram</span>
+            <span class="badge badge-wheat">🍵 Lentil</span>
+            <span class="badge badge-wheat">🍎 Pomegranate</span>
+            <span class="badge badge-wheat">🍌 Banana</span>
+            <span class="badge badge-wheat">🥭 Mango</span>
+            <span class="badge badge-wheat">🍇 Grapes</span>
+            <span class="badge badge-wheat">🍉 Watermelon</span>
+            <span class="badge badge-wheat">🍈 Muskmelon</span>
+            <span class="badge badge-wheat">🍏 Apple</span>
+            <span class="badge badge-wheat">🍊 Orange</span>
+            <span class="badge badge-wheat">🫐 Papaya</span>
+            <span class="badge badge-wheat">🥥 Coconut</span>
+            <span class="badge badge-wheat">☁️ Cotton</span>
+            <span class="badge badge-wheat">🌿 Jute</span>
+            <span class="badge badge-wheat">☕ Coffee</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/analytics.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+
+    // Override auth callback to initialize page-specific data after login
+    onPageInit = () => {
+      initAnalytics();
+    };
+
+    // Check for existing session
+    const user = await initAuth();
+    if (user) {
+      initAnalytics();
+    }
+  });
+</script>
+</body>
+</html>
+

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Data — AI Crop Dashboard</title>
+  <meta name="description" content="View, search, filter, and export all farmer data collected by the AI Crop Dashboard. State-wise breakdown with individual CSV exports." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-container fade-in">
+    <div class="auth-logo">
+      <div class="logo-big">🌾</div>
+      <h1>AI Crop Dashboard</h1>
+      <p>Please sign in to access the data</p>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="signin">Sign In</div>
+        <div class="auth-tab" data-tab="signup">Sign Up</div>
+      </div>
+      <form id="signinForm" class="auth-form active">
+        <div id="signinError" class="auth-error"></div>
+        <div class="form-group">
+          <label>📧 Email Address</label>
+          <input type="email" id="signinEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Password</label>
+          <input type="password" id="signinPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In →</button>
+      </form>
+      <form id="signupForm" class="auth-form">
+        <div id="signupError" class="auth-error"></div>
+        <div class="form-group">
+          <label>👤 Full Name</label>
+          <input type="text" id="signupName" placeholder="Ramesh Kumar" required />
+        </div>
+        <div class="form-group">
+          <label>📧 Gmail Address</label>
+          <input type="email" id="signupEmail" placeholder="ramesh@gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Password</label>
+          <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required />
+        </div>
+        <div class="form-group">
+          <label>🔒 Confirm Password</label>
+          <input type="password" id="signupConfirm" placeholder="Re-enter password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="app-wrapper">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🌾</div>
+      <div>
+        <h2>AI Crop</h2>
+        <span>Dashboard</span>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarUserInit">R</div>
+      <div class="sidebar-user-info">
+        <div class="greeting">Welcome back,</div>
+        <div class="user-name" id="sidebarUserName">Farmer</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main Menu</div>
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="alldata.html" class="nav-item active">
+        <span class="nav-icon">📊</span>
+        <span>All Data</span>
+      </a>
+      <a href="analytics.html" class="nav-item">
+        <span class="nav-icon">🔬</span>
+        <span>Analytics & Predict</span>
+      </a>
+      <div class="nav-section-label" style="margin-top:12px">Data Actions</div>
+      <a href="index.html#farmerFormSection" class="nav-item">
+        <span class="nav-icon">➕</span>
+        <span>Add Farmer Data</span>
+      </a>
+      <a href="#" class="nav-item" onclick="document.getElementById('exportAllBtn').click();return false;">
+        <span class="nav-icon">⬇</span>
+        <span>Export All CSV</span>
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="dark-mode-card" style="margin-bottom: 12px;">
+        <div class="dark-mode-row">
+          <div class="dark-mode-text-group">
+            <span class="dark-mode-title">Appearance</span>
+            <span class="dark-mode-subtitle" id="themeText">Light Mode</span>
+          </div>
+          <label class="cosmic-switch">
+            <input type="checkbox" id="darkToggle" />
+            <span class="cosmic-slider">
+              <span class="cosmic-icon light">☀️</span>
+              <span class="cosmic-icon dark">🌙</span>
+            </span>
+          </label>
+        </div>
+        
+        <div class="user-badge">
+          <div class="badge-dot-container">
+            <span class="status-dot"></span>
+          </div>
+          <div class="badge-text" id="sidebarEmail">Not signed in</div>
+        </div>
+      </div>
+
+      <button class="logout-btn" id="logoutBtn">
+        🚪 Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title">📊 All Data</div>
+          <div class="page-subtitle">Complete farmer records — search, filter, and export</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="recordCount" class="topbar-badge">Loading...</span>
+        <button id="exportAllBtn" class="btn btn-success">
+          ⬇ Export All CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- ===== ALL DATA TABLE ===== -->
+      <div class="card fade-in" style="margin-bottom:24px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🗂 All Farmer Records</div>
+            <div class="card-subtitle">Complete list of all submitted data entries</div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by name, state, crop, district..." />
+          </div>
+          <select id="stateFilterSelect" style="min-width:160px">
+            <option value="all">All States</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="renderAllTable()">
+            🔄 Refresh
+          </button>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Farmer Name</th>
+                <th>State</th>
+                <th>District</th>
+                <th>Village</th>
+                <th>Crop</th>
+                <th>Area</th>
+                <th>Soil</th>
+                <th>Season</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allTbody">
+              <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--muted)">Loading data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== STATE-WISE SECTION ===== -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🗺 State-wise Data Overview</div>
+            <div class="card-subtitle">View and export data grouped by each Indian state</div>
+          </div>
+        </div>
+        <div class="section-divider"></div>
+
+        <!-- Legend -->
+        <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)">
+          <span>🌾 Punjab</span>
+          <span>🌻 Haryana</span>
+          <span>🌿 Uttar Pradesh</span>
+          <span>🍊 Maharashtra</span>
+          <span>☕ Karnataka</span>
+          <span>🏜️ Rajasthan</span>
+          <span style="color:var(--primary);font-weight:600">— Click "Export" to download state CSV</span>
+        </div>
+
+        <div id="stateSectionList" class="state-section">
+          <div style="text-align:center;padding:32px;color:var(--muted)">Loading state data...</div>
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--card-border);display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--muted);flex:1">
+            💡 <b>Tip:</b> Each state's data can be exported as a separate CSV file for local analysis.
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('exportAllBtn').click()">
+            ⬇ Export Complete Dataset
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/alldata.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+
+    // Override auth callback to initialize page-specific data after login
+    onPageInit = () => {
+      initAllData();
+    };
+
+    // Check for existing session
+    const user = await initAuth();
+    if (user) {
+      initAllData();
+    }
+  });
+</script>
+</body>
+</html>
